@@ -1,0 +1,86 @@
+RONDITRACK MOBILE - WEEK 10 (Foundations and State), IN SIMPLE TERMS
+
+WHAT WE DID
+We built a phone app (Flutter) in a new repo called RondiTrack-Flutter, inside a mobile/ folder.
+It has 3 versions (dev, staging, prod) that install side by side, strict code checks, and automatic
+tests on GitHub. The app shows stokvels and contributions using FAKE data. Nothing calls the real
+API yet (that is Week 11), so Week 11 should only need one line changed per feature.
+
+FILES AND WHAT THEY DO
+
+SETUP AND CHECKS
+- mobile/android/app/build.gradle.kts : adds the 3 flavours (dev, staging, prod) with different app ids.
+- mobile/android/app/src/main/AndroidManifest.xml : launcher name now comes from the flavour.
+- mobile/config/dev.json, staging.json, prod.json : the API address for each flavour (nothing secret).
+- mobile/lib/app/config.dart : reads the config. Refuses to start with no config, or if the config
+  does not match the flavour that was built.
+- mobile/lib/main.dart, mobile/lib/app/app.dart : starts the app and sets up the theme and first screen.
+- mobile/pubspec.yaml / pubspec.lock : the packages used, pinned to exact versions (no ^).
+- mobile/analysis_options.yaml : strict lint rules (very_good_analysis and riverpod_lint).
+- mobile/.gitignore : generated files (*.g.dart, *.freezed.dart) are not committed.
+- .github/workflows/ci.yml : on every pull request GitHub checks format, generates code, runs
+  dart analyze and runs the tests.
+
+MONEY (always whole cents, never decimals)
+- core/money/cents.dart : a Cents type that wraps a whole number.
+- core/money/money_format.dart : shows cents as South African rands, e.g. R 1 500,00.
+- core/money/money_parse.dart : turns typed text like "R 1 500,50" into cents, or says why it is wrong.
+  A full stop is allowed as a decimal sign (150.50) because many keyboards have no comma.
+
+DOMAIN (what the app is about)
+- features/stokvel/domain/enums.dart : cycle status, contribution status and role. A new unknown
+  word from the API becomes "unknown" instead of crashing.
+- features/stokvel/domain/models.dart : Membership, Stokvel, Cycle, Contribution, StokvelDetail.
+  The role belongs to the membership (per stokvel), never to the user.
+- features/stokvel/domain/actions.dart : one function that decides what you can do (pay, upload
+  proof, confirm, close cycle, record payout). If a new status is added the code will not compile
+  until someone decides what it means.
+- features/home/domain/home_entry.dart : one card on the Home screen.
+- core/errors.dart : "not found". It is used for missing stokvels AND stokvels you are not in.
+
+STATE AND FAKE DATA
+- features/stokvel/data/seed.dart : fake people (Lerato, Thabo, Sipho), stokvels, cycles, contributions.
+- features/stokvel/data/fake_stokvel_repository.dart and features/home/data/fake_home_repository.dart :
+  pretend servers with a pretend delay (Soweto Teachers is slow on purpose).
+- features/*/domain/*_repository.dart : interfaces, so screens never know about the fakes.
+- features/home/application/home_providers.dart : Home data and the one line that picks the repository.
+- features/stokvel/application/stokvel_providers.dart : stokvel detail data, one per stokvel id,
+  thrown away when nobody is watching it.
+- core/session/session.dart : who is signed in (stand-in for Week 11).
+- core/view_state.dart : the 4 screen states (loading, empty, data, failure) in one place.
+
+SCREENS
+- features/home/presentation/home_screen.dart : list of stokvel cards, pull to refresh, empty message,
+  failure with Retry.
+- features/home/presentation/persona_menu.dart : switch between Lerato, Thabo, Sipho for testing.
+- features/stokvel/presentation/stokvel_detail_screen.dart : stokvel details, contributions, allowed
+  action buttons, and a switcher to another stokvel. It never shows the old stokvel's data.
+- features/stokvel/presentation/labels.dart : words for every status (never colour alone).
+- core/widgets.dart, core/format_date.dart : loading and retry widgets, date text.
+
+TESTS (mobile/test/...)
+- app/config_test.dart : the config refusals.
+- core/money_test.dart : formatting and parsing cases.
+- stokvel/enums_test.dart, membership_test.dart, actions_test.dart : status mapping, Lerato is
+  Treasurer in one stokvel and Member in another, one test per action rule.
+- core/view_state_test.dart : "no stokvels" counts as empty, not data.
+- home/home_screen_test.dart, stokvel/stokvel_detail_screen_test.dart : the 4 states, Treasurer
+  buttons only where you are Treasurer, "not found" for stokvels that are not yours, and the test
+  that switching stokvels never shows the old one.
+- stokvel/stokvel_detail_provider_test.dart : two ids keep separate state, two listeners share one
+  fetch, state is disposed when nothing watches it.
+- support/stubs.dart : small fake repositories used by tests.
+
+DOCS AND PROOF
+- mobile/README.md : contract notes, how to run each flavour, why generated code is not committed,
+  money rules, what breaks when the API adds a status, provider lifetimes and sign-out plan.
+- lint_demo.dart (temporary, on branch ci-demo-lint) : a deliberate lint mistake to show CI goes
+  red, then it is removed to show CI goes green.
+
+GIT WORKFLOW
+Work was done on branch assignment-10.1 with one commit per part, then a draft pull request. A second
+branch ci-demo-lint proves the CI catches a lint that flutter analyze would miss.
+
+STILL TO DO BY HAND
+Check the API spellings and personas against openapi/v1.json, run all 3 flavours on the emulator,
+take the screenshots and recording, and paste the red and green CI links into the pull request.
