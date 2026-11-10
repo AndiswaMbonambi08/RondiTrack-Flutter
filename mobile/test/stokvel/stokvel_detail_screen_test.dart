@@ -56,9 +56,7 @@ void main() {
     expect(find.text('Pay'), findsOneWidget);
   });
 
-  testWidgets('a stokvel that is not yours reads as not found', (
-    tester,
-  ) async {
+  testWidgets('a stokvel that is not yours reads as not found', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         retry: (retryCount, error) => null,

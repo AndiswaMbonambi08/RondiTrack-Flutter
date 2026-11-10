@@ -92,10 +92,7 @@ class _StokvelCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                entry.name,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
+              Text(entry.name, style: Theme.of(context).textTheme.titleMedium),
               Text('Your role: ${roleLabel(entry.role)}'),
               const SizedBox(height: 8),
               Text('Paid: ${formatRands(entry.paid)}'),

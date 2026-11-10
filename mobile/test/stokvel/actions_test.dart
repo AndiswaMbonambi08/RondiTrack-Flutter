@@ -124,11 +124,7 @@ void main() {
     ),
     (
       'treasurer, unknown cycle',
-      (
-        role: StokvelRole.treasurer,
-        cycle: CycleStatus.unknown,
-        mine: null,
-      ),
+      (role: StokvelRole.treasurer, cycle: CycleStatus.unknown, mine: null),
       none,
     ),
     (

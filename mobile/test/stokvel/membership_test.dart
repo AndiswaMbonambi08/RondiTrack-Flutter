@@ -16,7 +16,13 @@ void main() {
     );
 
     final repo = FakeStokvelRepository(personaId: 'lerato', delayScale: 0);
-    expect((await repo.fetchDetail('mabena-family')).role, StokvelRole.treasurer);
-    expect((await repo.fetchDetail('soweto-teachers')).role, StokvelRole.member);
+    expect(
+      (await repo.fetchDetail('mabena-family')).role,
+      StokvelRole.treasurer,
+    );
+    expect(
+      (await repo.fetchDetail('soweto-teachers')).role,
+      StokvelRole.member,
+    );
   });
 }

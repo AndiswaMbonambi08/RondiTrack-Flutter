@@ -5,11 +5,8 @@ void main() {
   group('AppConfig.resolve', () {
     test('refuses to start without a config', () {
       expect(
-        () => AppConfig.resolve(
-          flavor: '',
-          apiBaseUrl: '',
-          nativeFlavor: 'dev',
-        ),
+        () =>
+            AppConfig.resolve(flavor: '', apiBaseUrl: '', nativeFlavor: 'dev'),
         throwsA(isA<ConfigError>()),
       );
     });
