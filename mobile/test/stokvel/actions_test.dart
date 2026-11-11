@@ -2,93 +2,57 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ronditrack/features/stokvel/domain/actions.dart';
 import 'package:ronditrack/features/stokvel/domain/enums.dart';
 
+ActionContext _ctx(
+  StokvelRole role,
+  CycleStatus cycle,
+  ContributionStatus? mine,
+) => (role: role, cycle: cycle, mine: mine);
+
 void main() {
   const none = <StokvelAction>{};
+  const member = StokvelRole.member;
+  const treasurer = StokvelRole.treasurer;
+  const open = CycleStatus.open;
   final rows = <(String, ActionContext, Set<StokvelAction>)>[
     (
       'member, open, pending',
-      (
-        role: StokvelRole.member,
-        cycle: CycleStatus.open,
-        mine: ContributionStatus.pending,
-      ),
-      {StokvelAction.pay},
-    ),
-    (
-      'member, open, overdue',
-      (
-        role: StokvelRole.member,
-        cycle: CycleStatus.open,
-        mine: ContributionStatus.overdue,
-      ),
+      _ctx(member, open, ContributionStatus.pending),
       {StokvelAction.pay},
     ),
     (
       'member, open, paid',
-      (
-        role: StokvelRole.member,
-        cycle: CycleStatus.open,
-        mine: ContributionStatus.paid,
-      ),
+      _ctx(member, open, ContributionStatus.paid),
       {StokvelAction.uploadProof},
     ),
     (
       'member, open, confirmed',
-      (
-        role: StokvelRole.member,
-        cycle: CycleStatus.open,
-        mine: ContributionStatus.confirmed,
-      ),
+      _ctx(member, open, ContributionStatus.confirmed),
       none,
     ),
-    (
-      'member, open, no contribution',
-      (role: StokvelRole.member, cycle: CycleStatus.open, mine: null),
-      none,
-    ),
+    ('member, open, no contribution', _ctx(member, open, null), none),
     (
       'member, open, unknown contribution',
-      (
-        role: StokvelRole.member,
-        cycle: CycleStatus.open,
-        mine: ContributionStatus.unknown,
-      ),
+      _ctx(member, open, ContributionStatus.unknown),
       none,
     ),
     (
       'member, closed, pending',
-      (
-        role: StokvelRole.member,
-        cycle: CycleStatus.closed,
-        mine: ContributionStatus.pending,
-      ),
+      _ctx(member, CycleStatus.closed, ContributionStatus.pending),
       none,
     ),
     (
       'member, paidOut, confirmed',
-      (
-        role: StokvelRole.member,
-        cycle: CycleStatus.paidOut,
-        mine: ContributionStatus.confirmed,
-      ),
+      _ctx(member, CycleStatus.paidOut, ContributionStatus.confirmed),
       none,
     ),
     (
       'member, unknown cycle, pending',
-      (
-        role: StokvelRole.member,
-        cycle: CycleStatus.unknown,
-        mine: ContributionStatus.pending,
-      ),
+      _ctx(member, CycleStatus.unknown, ContributionStatus.pending),
       none,
     ),
     (
       'treasurer, open, pending',
-      (
-        role: StokvelRole.treasurer,
-        cycle: CycleStatus.open,
-        mine: ContributionStatus.pending,
-      ),
+      _ctx(treasurer, open, ContributionStatus.pending),
       {
         StokvelAction.pay,
         StokvelAction.confirmContributions,
@@ -97,43 +61,32 @@ void main() {
     ),
     (
       'treasurer, open, confirmed',
-      (
-        role: StokvelRole.treasurer,
-        cycle: CycleStatus.open,
-        mine: ContributionStatus.confirmed,
-      ),
+      _ctx(treasurer, open, ContributionStatus.confirmed),
       {StokvelAction.confirmContributions, StokvelAction.closeCycle},
     ),
     (
       'treasurer, closed, confirmed',
-      (
-        role: StokvelRole.treasurer,
-        cycle: CycleStatus.closed,
-        mine: ContributionStatus.confirmed,
-      ),
+      _ctx(treasurer, CycleStatus.closed, ContributionStatus.confirmed),
       {StokvelAction.recordPayout},
     ),
     (
       'treasurer, paidOut, confirmed',
-      (
-        role: StokvelRole.treasurer,
-        cycle: CycleStatus.paidOut,
-        mine: ContributionStatus.confirmed,
-      ),
+      _ctx(treasurer, CycleStatus.paidOut, ContributionStatus.confirmed),
       none,
     ),
     (
       'treasurer, unknown cycle',
-      (role: StokvelRole.treasurer, cycle: CycleStatus.unknown, mine: null),
+      _ctx(treasurer, CycleStatus.unknown, null),
       none,
     ),
     (
+      'admin, open, confirmed (same as treasurer)',
+      _ctx(StokvelRole.admin, open, ContributionStatus.confirmed),
+      {StokvelAction.confirmContributions, StokvelAction.closeCycle},
+    ),
+    (
       'unknown role, open, pending',
-      (
-        role: StokvelRole.unknown,
-        cycle: CycleStatus.open,
-        mine: ContributionStatus.pending,
-      ),
+      _ctx(StokvelRole.unknown, open, ContributionStatus.pending),
       none,
     ),
   ];

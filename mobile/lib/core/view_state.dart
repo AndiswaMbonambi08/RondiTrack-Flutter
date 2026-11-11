@@ -2,26 +2,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ronditrack/core/errors.dart';
 
 sealed class ViewState<T> {
-  const ViewState();
+  const new();
 }
 
 final class ViewLoading<T> extends ViewState<T> {
-  const ViewLoading();
+  const new();
 }
 
 final class ViewEmpty<T> extends ViewState<T> {
-  const ViewEmpty();
+  const new();
 }
 
 final class ViewData<T> extends ViewState<T> {
-  const ViewData(this.data, {this.refreshing = false});
+  const new(this.data, {this.refreshing = false});
 
   final T data;
   final bool refreshing;
 }
 
 final class ViewFailure<T> extends ViewState<T> {
-  const ViewFailure(this.message);
+  const new(this.message);
 
   final String message;
 }

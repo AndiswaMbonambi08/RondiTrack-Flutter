@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ronditrack/core/session/session.dart';
 
 class PersonaMenu extends ConsumerWidget {
-  const PersonaMenu({super.key});
+  const new({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

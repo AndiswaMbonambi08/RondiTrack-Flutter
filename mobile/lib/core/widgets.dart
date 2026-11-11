@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LoadingView extends StatelessWidget {
-  const LoadingView({super.key});
+  const new({super.key});
 
   @override
   Widget build(BuildContext context) =>
@@ -9,7 +9,7 @@ class LoadingView extends StatelessWidget {
 }
 
 class FailureView extends StatelessWidget {
-  const FailureView({required this.message, required this.onRetry, super.key});
+  const new({required this.message, required this.onRetry, super.key});
 
   final String message;
   final VoidCallback onRetry;

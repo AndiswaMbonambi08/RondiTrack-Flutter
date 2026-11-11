@@ -5,7 +5,7 @@ import 'package:ronditrack/features/stokvel/data/seed.dart';
 import 'package:ronditrack/features/stokvel/domain/models.dart';
 
 class FakeHomeRepository implements HomeRepository {
-  FakeHomeRepository({required this.personaId, this.delayScale = 1});
+  new({required this.personaId, this.delayScale = 1});
 
   final String personaId;
   final double delayScale;

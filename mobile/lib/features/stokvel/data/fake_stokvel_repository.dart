@@ -6,7 +6,7 @@ import 'package:ronditrack/features/stokvel/domain/stokvel_repository.dart';
 
 class FakeStokvelRepository implements StokvelRepository {
   /// [delayScale] 0 removes the pretend network delay (tests).
-  FakeStokvelRepository({required this.personaId, this.delayScale = 1});
+  new({required this.personaId, this.delayScale = 1});
 
   final String personaId;
   final double delayScale;

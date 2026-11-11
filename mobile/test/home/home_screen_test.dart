@@ -33,7 +33,7 @@ void main() {
         retry: (retryCount, error) => null,
         overrides: [
           homeRepositoryProvider.overrideWithValue(
-            FakeHomeRepository(personaId: 'sipho', delayScale: 0),
+            FakeHomeRepository(personaId: 'platform-admin', delayScale: 0),
           ),
         ],
         child: const MaterialApp(home: HomeScreen()),
@@ -52,15 +52,15 @@ void main() {
         retry: (retryCount, error) => null,
         overrides: [
           homeRepositoryProvider.overrideWithValue(
-            FakeHomeRepository(personaId: 'lerato', delayScale: 0),
+            FakeHomeRepository(personaId: 'sipho', delayScale: 0),
           ),
         ],
         child: const MaterialApp(home: HomeScreen()),
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Mabena Family'), findsOneWidget);
-    expect(find.text('Soweto Teachers'), findsOneWidget);
+    expect(find.text('Ubuntu Savings Circle'), findsOneWidget);
+    expect(find.text('Umoja Family Fund'), findsOneWidget);
     expect(find.text('Your role: Treasurer'), findsOneWidget);
     expect(find.text('Your role: Member'), findsOneWidget);
   });

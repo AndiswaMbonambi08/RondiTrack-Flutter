@@ -7,7 +7,7 @@ part 'home_entry.freezed.dart';
 /// One card on Home. The numbers come from the API; the app never computes.
 @freezed
 abstract class HomeEntry with _$HomeEntry {
-  const factory HomeEntry({
+  const factory({
     required String stokvelId,
     required String name,
     required StokvelRole role,

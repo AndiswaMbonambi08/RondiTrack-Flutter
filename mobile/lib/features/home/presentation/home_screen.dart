@@ -11,7 +11,7 @@ import 'package:ronditrack/features/stokvel/presentation/labels.dart';
 import 'package:ronditrack/features/stokvel/presentation/stokvel_detail_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+  const new({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -52,7 +52,7 @@ class HomeScreen extends ConsumerWidget {
 }
 
 class _EmptyHome extends StatelessWidget {
-  const _EmptyHome();
+  const new();
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class _EmptyHome extends StatelessWidget {
 }
 
 class _StokvelCard extends StatelessWidget {
-  const _StokvelCard({required this.entry});
+  const new({required this.entry});
 
   final HomeEntry entry;
 

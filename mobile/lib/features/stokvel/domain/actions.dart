@@ -15,14 +15,11 @@ typedef ActionContext = ({
 });
 
 /// What can I do here? No wildcard over a status: a new status is a compile
-/// error in this file until someone decides.
+/// error in this file until someone decides. Admin satisfies every Treasurer
+/// check (the API's role order is Member, Treasurer, Admin).
 Set<StokvelAction> allowedActions(ActionContext context) {
   final memberActions = switch ((context.cycle, context.mine)) {
-    (
-      CycleStatus.open,
-      ContributionStatus.pending || ContributionStatus.overdue,
-    ) =>
-      const {StokvelAction.pay},
+    (CycleStatus.open, ContributionStatus.pending) => const {StokvelAction.pay},
     (CycleStatus.open, ContributionStatus.paid) => const {
       StokvelAction.uploadProof,
     },
@@ -36,7 +33,6 @@ Set<StokvelAction> allowedActions(ActionContext context) {
       ContributionStatus.pending ||
           ContributionStatus.paid ||
           ContributionStatus.confirmed ||
-          ContributionStatus.overdue ||
           ContributionStatus.unknown ||
           null,
     ) =>
@@ -44,14 +40,17 @@ Set<StokvelAction> allowedActions(ActionContext context) {
   };
 
   final treasurerActions = switch ((context.role, context.cycle)) {
-    (StokvelRole.treasurer, CycleStatus.open) => const {
+    (StokvelRole.treasurer || StokvelRole.admin, CycleStatus.open) => const {
       StokvelAction.confirmContributions,
       StokvelAction.closeCycle,
     },
-    (StokvelRole.treasurer, CycleStatus.closed) => const {
+    (StokvelRole.treasurer || StokvelRole.admin, CycleStatus.closed) => const {
       StokvelAction.recordPayout,
     },
-    (StokvelRole.treasurer, CycleStatus.paidOut || CycleStatus.unknown) =>
+    (
+      StokvelRole.treasurer || StokvelRole.admin,
+      CycleStatus.paidOut || CycleStatus.unknown,
+    ) =>
       const <StokvelAction>{},
     (
       StokvelRole.member || StokvelRole.unknown,
@@ -66,6 +65,7 @@ Set<StokvelAction> allowedActions(ActionContext context) {
   return switch (context.role) {
     StokvelRole.unknown => const <StokvelAction>{},
     StokvelRole.member ||
-    StokvelRole.treasurer => {...memberActions, ...treasurerActions},
+    StokvelRole.treasurer ||
+    StokvelRole.admin => {...memberActions, ...treasurerActions},
   };
 }

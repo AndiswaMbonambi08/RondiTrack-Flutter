@@ -3,7 +3,7 @@ import 'package:flutter/services.dart' show appFlavor;
 enum Flavor { dev, staging, prod }
 
 class ConfigError implements Exception {
-  ConfigError(this.message);
+  new(this.message);
 
   final String message;
 
@@ -12,9 +12,9 @@ class ConfigError implements Exception {
 }
 
 class AppConfig {
-  const AppConfig({required this.flavor, required this.apiBaseUrl});
+  const new({required this.flavor, required this.apiBaseUrl});
 
-  factory AppConfig.fromEnvironment() => AppConfig.resolve(
+  factory fromEnvironment() => AppConfig.resolve(
     flavor: const String.fromEnvironment('FLAVOR'),
     apiBaseUrl: const String.fromEnvironment('API_BASE_URL'),
     nativeFlavor: appFlavor,
@@ -22,7 +22,7 @@ class AppConfig {
 
   /// Pure and testable: validates the dart-define values against the native
   /// flavour the binary was built with.
-  factory AppConfig.resolve({
+  factory resolve({
     required String flavor,
     required String apiBaseUrl,
     required String? nativeFlavor,

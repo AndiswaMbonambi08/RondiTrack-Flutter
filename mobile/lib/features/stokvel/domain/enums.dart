@@ -7,7 +7,7 @@ enum CycleStatus {
   paidOut('PaidOut'),
   unknown('');
 
-  const CycleStatus(this.wire);
+  new(this.wire);
 
   final String wire;
 
@@ -21,10 +21,9 @@ enum ContributionStatus {
   pending('Pending'),
   paid('Paid'),
   confirmed('Confirmed'),
-  overdue('Overdue'),
   unknown('');
 
-  const ContributionStatus(this.wire);
+  new(this.wire);
 
   final String wire;
 
@@ -37,9 +36,10 @@ enum ContributionStatus {
 enum StokvelRole {
   member('Member'),
   treasurer('Treasurer'),
+  admin('Admin'),
   unknown('');
 
-  const StokvelRole(this.wire);
+  new(this.wire);
 
   final String wire;
 

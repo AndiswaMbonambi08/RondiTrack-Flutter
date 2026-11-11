@@ -4,7 +4,7 @@ import 'package:ronditrack/features/stokvel/domain/models.dart';
 import 'package:ronditrack/features/stokvel/domain/stokvel_repository.dart';
 
 class StubHomeRepository implements HomeRepository {
-  StubHomeRepository(this._fetch);
+  new(this._fetch);
 
   final Future<List<HomeEntry>> Function() _fetch;
 
@@ -13,7 +13,7 @@ class StubHomeRepository implements HomeRepository {
 }
 
 class StubStokvelRepository implements StokvelRepository {
-  StubStokvelRepository(this._fetch);
+  new(this._fetch);
 
   final Future<StokvelDetail> Function(String id) _fetch;
 

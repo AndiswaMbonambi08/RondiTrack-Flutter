@@ -7,15 +7,13 @@ part 'models.freezed.dart';
 /// The role belongs to the membership. There is no User.role.
 @freezed
 abstract class Membership with _$Membership {
-  const factory Membership({
-    required String stokvelId,
-    required StokvelRole role,
-  }) = _Membership;
+  const factory({required String stokvelId, required StokvelRole role}) =
+      _Membership;
 }
 
 @freezed
 abstract class Stokvel with _$Stokvel {
-  const factory Stokvel({
+  const factory({
     required String id,
     required String name,
     required Cents contributionAmount,
@@ -24,7 +22,7 @@ abstract class Stokvel with _$Stokvel {
 
 @freezed
 abstract class Cycle with _$Cycle {
-  const factory Cycle({
+  const factory({
     required String id,
     required int number,
     required CycleStatus status,
@@ -35,7 +33,7 @@ abstract class Cycle with _$Cycle {
 
 @freezed
 abstract class Contribution with _$Contribution {
-  const factory Contribution({
+  const factory({
     required String id,
     required String memberId,
     required String memberName,
@@ -46,7 +44,7 @@ abstract class Contribution with _$Contribution {
 
 @freezed
 abstract class StokvelDetail with _$StokvelDetail {
-  const factory StokvelDetail({
+  const factory({
     required Stokvel stokvel,
     required StokvelRole role,
     required Cycle? cycle,

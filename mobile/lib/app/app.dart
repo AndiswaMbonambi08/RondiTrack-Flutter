@@ -3,7 +3,7 @@ import 'package:ronditrack/app/config.dart';
 import 'package:ronditrack/features/home/presentation/home_screen.dart';
 
 class RondiTrackApp extends StatelessWidget {
-  const RondiTrackApp({required this.config, super.key});
+  const new({required this.config, super.key});
 
   final AppConfig config;
 

@@ -3,17 +3,17 @@ import 'package:ronditrack/core/money/cents.dart';
 enum MoneyParseFailure { empty, tooManyDecimals, invalid }
 
 sealed class MoneyParseResult {
-  const MoneyParseResult();
+  const new();
 }
 
 final class MoneyParsed extends MoneyParseResult {
-  const MoneyParsed(this.amount);
+  const new(this.amount);
 
   final Cents amount;
 }
 
 final class MoneyRejected extends MoneyParseResult {
-  const MoneyRejected(this.reason);
+  const new(this.reason);
 
   final MoneyParseFailure reason;
 }

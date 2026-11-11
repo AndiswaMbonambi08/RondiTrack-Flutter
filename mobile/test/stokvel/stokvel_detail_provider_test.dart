@@ -6,7 +6,7 @@ import 'package:ronditrack/features/stokvel/data/fake_stokvel_repository.dart';
 import '../support/stubs.dart';
 
 void main() {
-  final fake = FakeStokvelRepository(personaId: 'lerato', delayScale: 0);
+  final fake = FakeStokvelRepository(personaId: 'sipho', delayScale: 0);
 
   test('two ids keep separate state', () async {
     final container = ProviderContainer(
@@ -14,15 +14,15 @@ void main() {
       overrides: [stokvelRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
-    final a = stokvelDetailProvider('mabena-family');
-    final b = stokvelDetailProvider('soweto-teachers');
+    final a = stokvelDetailProvider('ubuntu-savings-circle');
+    final b = stokvelDetailProvider('umoja-family-fund');
     container
       ..listen(a, (_, _) {})
       ..listen(b, (_, _) {});
     final detailA = await container.read(a.future);
     final detailB = await container.read(b.future);
-    expect(detailA.stokvel.name, 'Mabena Family');
-    expect(detailB.stokvel.name, 'Soweto Teachers');
+    expect(detailA.stokvel.name, 'Ubuntu Savings Circle');
+    expect(detailB.stokvel.name, 'Umoja Family Fund');
   });
 
   test('two listeners on one id share one fetch', () async {
@@ -39,7 +39,7 @@ void main() {
       ],
     );
     addTearDown(container.dispose);
-    final provider = stokvelDetailProvider('mabena-family');
+    final provider = stokvelDetailProvider('ubuntu-savings-circle');
     container
       ..listen(provider, (_, _) {})
       ..listen(provider, (_, _) {});
@@ -53,7 +53,7 @@ void main() {
       overrides: [stokvelRepositoryProvider.overrideWithValue(fake)],
     );
     addTearDown(container.dispose);
-    final provider = stokvelDetailProvider('mabena-family');
+    final provider = stokvelDetailProvider('ubuntu-savings-circle');
     final sub = container.listen(provider, (_, _) {});
     await container.read(provider.future);
     expect(container.exists(provider), isTrue);

@@ -12,13 +12,13 @@ String contributionLabel(ContributionStatus status) => switch (status) {
   ContributionStatus.pending => 'Pending',
   ContributionStatus.paid => 'Paid, awaiting confirmation',
   ContributionStatus.confirmed => 'Confirmed',
-  ContributionStatus.overdue => 'Overdue',
   ContributionStatus.unknown => 'Status unavailable',
 };
 
 String roleLabel(StokvelRole role) => switch (role) {
   StokvelRole.member => 'Member',
   StokvelRole.treasurer => 'Treasurer',
+  StokvelRole.admin => 'Admin',
   StokvelRole.unknown => 'Unknown role',
 };
 

@@ -13,21 +13,19 @@ import 'package:ronditrack/features/stokvel/presentation/stokvel_detail_screen.d
 import '../support/stubs.dart';
 
 void main() {
-  final home = FakeHomeRepository(personaId: 'lerato', delayScale: 0);
-  final lerato = FakeStokvelRepository(personaId: 'lerato', delayScale: 0);
+  final home = FakeHomeRepository(personaId: 'sipho', delayScale: 0);
+  final sipho = FakeStokvelRepository(personaId: 'sipho', delayScale: 0);
 
-  testWidgets('Treasurer actions appear where she is Treasurer', (
-    tester,
-  ) async {
+  testWidgets('Treasurer actions appear where he is Treasurer', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         retry: (retryCount, error) => null,
         overrides: [
           homeRepositoryProvider.overrideWithValue(home),
-          stokvelRepositoryProvider.overrideWithValue(lerato),
+          stokvelRepositoryProvider.overrideWithValue(sipho),
         ],
         child: const MaterialApp(
-          home: StokvelDetailScreen(stokvelId: 'mabena-family'),
+          home: StokvelDetailScreen(stokvelId: 'umoja-family-fund'),
         ),
       ),
     );
@@ -42,15 +40,15 @@ void main() {
         retry: (retryCount, error) => null,
         overrides: [
           homeRepositoryProvider.overrideWithValue(home),
-          stokvelRepositoryProvider.overrideWithValue(lerato),
+          stokvelRepositoryProvider.overrideWithValue(sipho),
         ],
         child: const MaterialApp(
-          home: StokvelDetailScreen(stokvelId: 'soweto-teachers'),
+          home: StokvelDetailScreen(stokvelId: 'ubuntu-savings-circle'),
         ),
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Soweto Teachers'), findsWidgets);
+    expect(find.text('Ubuntu Savings Circle'), findsWidgets);
     expect(find.text('Close cycle'), findsNothing);
     expect(find.text('Confirm contributions'), findsNothing);
     expect(find.text('Pay'), findsOneWidget);
@@ -62,14 +60,14 @@ void main() {
         retry: (retryCount, error) => null,
         overrides: [
           homeRepositoryProvider.overrideWithValue(
-            FakeHomeRepository(personaId: 'sipho', delayScale: 0),
+            FakeHomeRepository(personaId: 'platform-admin', delayScale: 0),
           ),
           stokvelRepositoryProvider.overrideWithValue(
-            FakeStokvelRepository(personaId: 'sipho', delayScale: 0),
+            FakeStokvelRepository(personaId: 'platform-admin', delayScale: 0),
           ),
         ],
         child: const MaterialApp(
-          home: StokvelDetailScreen(stokvelId: 'mabena-family'),
+          home: StokvelDetailScreen(stokvelId: 'umoja-family-fund'),
         ),
       ),
     );
@@ -88,28 +86,34 @@ void main() {
           homeRepositoryProvider.overrideWithValue(home),
           stokvelRepositoryProvider.overrideWithValue(
             StubStokvelRepository(
-              (id) => id == 'soweto-teachers'
+              (id) => id == 'umoja-family-fund'
                   ? slow.future
-                  : lerato.fetchDetail(id),
+                  : sipho.fetchDetail(id),
             ),
           ),
         ],
         child: const MaterialApp(
-          home: StokvelDetailScreen(stokvelId: 'mabena-family'),
+          home: StokvelDetailScreen(stokvelId: 'ubuntu-savings-circle'),
         ),
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Nomsa'), findsOneWidget); // A's contributions
+    expect(find.text('Thandiwe'), findsOneWidget); // A's contributions
 
     await tester.tap(find.byTooltip('Switch stokvel'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Soweto Teachers').last);
+    await tester.tap(find.text('Umoja Family Fund').last);
     await tester.pump(); // one frame
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(find.text('Nomsa'), findsNothing);
-    expect(find.text('Mpho'), findsNothing);
-    expect(find.text('Mabena Family'), findsNothing);
+    expect(find.text('Thandiwe'), findsNothing);
+    expect(find.text('Zanele'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(ListView),
+        matching: find.text('Ubuntu Savings Circle'),
+      ),
+      findsNothing,
+    );
   });
 }

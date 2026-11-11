@@ -13,7 +13,7 @@ import 'package:ronditrack/features/stokvel/domain/models.dart';
 import 'package:ronditrack/features/stokvel/presentation/labels.dart';
 
 class StokvelDetailScreen extends ConsumerStatefulWidget {
-  const StokvelDetailScreen({required this.stokvelId, super.key});
+  const new({required this.stokvelId, super.key});
 
   final String stokvelId;
 
@@ -65,7 +65,7 @@ class _StokvelDetailScreenState extends ConsumerState<StokvelDetailScreen> {
 }
 
 class _DetailBody extends StatelessWidget {
-  const _DetailBody({required this.detail});
+  const new({required this.detail});
 
   final StokvelDetail detail;
 

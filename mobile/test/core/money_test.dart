@@ -13,11 +13,11 @@ void main() {
       100000000: 'R\u00A01\u00A0000\u00A0000,00',
       -15000: '-R\u00A0150,00',
     };
-    cases.forEach((cents, expected) {
+    for (final MapEntry(key: cents, value: expected) in cases.entries) {
       test('$cents cents', () {
         expect(formatRands(Cents(cents)), expected);
       });
-    });
+    }
   });
 
   group('parseRands accepts', () {
@@ -31,14 +31,14 @@ void main() {
       '1\u00A0500,50': 150050,
       '150.50': 15050, // decision: full stop is a decimal separator
     };
-    cases.forEach((input, cents) {
+    for (final MapEntry(key: input, value: cents) in cases.entries) {
       test('"$input"', () {
         expect(
           parseRands(input),
           isA<MoneyParsed>().having((p) => p.amount.value, 'cents', cents),
         );
       });
-    });
+    }
   });
 
   group('parseRands refuses', () {
@@ -51,13 +51,13 @@ void main() {
       'abc': MoneyParseFailure.invalid,
       '12abc': MoneyParseFailure.invalid,
     };
-    cases.forEach((input, reason) {
+    for (final MapEntry(key: input, value: reason) in cases.entries) {
       test('"$input"', () {
         expect(
           parseRands(input),
           isA<MoneyRejected>().having((r) => r.reason, 'reason', reason),
         );
       });
-    });
+    }
   });
 }
