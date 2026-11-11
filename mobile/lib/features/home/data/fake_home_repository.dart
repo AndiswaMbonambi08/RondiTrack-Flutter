@@ -13,6 +13,9 @@ class FakeHomeRepository implements HomeRepository {
   @override
   Future<List<HomeEntry>> fetchHome() async {
     await pretendNetwork(500, delayScale);
+    if (personaId == 'broken') {
+      throw Exception('Pretend network failure');
+    }
     final memberships = seedMemberships[personaId] ?? const <Membership>[];
     return [
       for (final m in memberships)
