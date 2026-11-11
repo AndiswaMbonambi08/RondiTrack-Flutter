@@ -68,3 +68,13 @@ At run time on a phone with an old install, the new string `Archived` is not in 
 Disposal proof: `test/stokvel/stokvel_detail_provider_test.dart` shows the id's state no longer exists once nothing listens; the provider also logs `stokvelDetail disposed id=<id>` (id only, never a name or an amount).
 
 **Sign-out.** Sign-out will rebuild the root `ProviderScope` with a new key, which disposes every provider including the kept-alive ones (session, repositories, any cached data), so nothing survives into the next person's session on a shared phone. Sign-out will also clear the stored token first and invalidate `currentPersona` so a failed scope rebuild cannot leave an identity behind.
+
+## CI catches a lint
+
+To prove CI catches what only `riverpod_lint` reports, pull request #3 (`ci-demo-lint`) adds a public field on a notifier. The rule is `avoid_public_notifier_properties`.
+
+- Red run: https://github.com/AndiswaMbonambi08/RondiTrack-Flutter/actions/runs/42940795867 (fails on the Analyze step, Test is skipped)
+- Green run after the fix: https://github.com/AndiswaMbonambi08/RondiTrack-Flutter/actions/runs/42941090417
+- Pull request: https://github.com/AndiswaMbonambi08/RondiTrack-Flutter/pull/3
+
+`flutter analyze` alone would have let it through. It does not load analyser plugins, so `riverpod_lint` never runs under it. Only `dart analyze` loads the plugin, which is why CI runs `dart analyze --fatal-infos`.
