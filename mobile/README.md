@@ -14,8 +14,10 @@ Contract copy: `contract/schema.d.ts` is the openapi-typescript output of the AP
 5. **Seed personas.** Sipho: Member of Ubuntu Savings Circle and Treasurer of Umoja Family Fund (one login, two roles). Nomsa: Admin of Umoja Family Fund. The platform admin (`admin@example.com`) stays out of stokvel membership, so it is the empty-Home persona. The fakes hold the same people and stokvels; contributors and amounts inside them are made-up fake data.
 
 Backend gaps found: `role` and cycle `status` are published as plain `string` in the OpenAPI document, not as enums, so the contract does not list their spellings (only a description does). Recorded as a gap, not fixed this week: the app maps any unexpected string to `unknown`.
+
 ## Running it
 
+- API repo: `AndiswaMbonambi08/RondiTrack`. Nothing calls it yet: the app runs on fake repositories with the seed personas, so no API needs to be started this week. In Week 11 the dev flavour points at it (start it with `docker compose up` or `dotnet run` as its README says).
 - Flutter 3.47.7. First Gradle build can take over ten minutes.
 - `flutter run --flavor dev --dart-define-from-file=config/dev.json`
 - `flutter run --flavor staging --dart-define-from-file=config/staging.json`
@@ -27,10 +29,6 @@ Backend gaps found: `role` and cycle `status` are published as plain `string` in
 ## Generated code
 
 **Ignored in Git, generated in CI.** Reason: generated files make noisy diffs and merge conflicts and can go stale; CI always builds them from source. CI order works with this: `pub get`, format check (before generation, so generated files are never formatted-checked), `build_runner build`, `dart analyze --fatal-infos`, `flutter test`.
-
-## Lint proof (riverpod_lint)
-
-A pull request adds a public field on a notifier. `riverpod_lint` reports it only through `dart analyze`; `flutter analyze` does not run analyser plugins, so it would have passed. Red run linked in the PR description.
 
 ## Money
 
