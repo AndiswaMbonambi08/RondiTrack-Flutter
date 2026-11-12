@@ -9,7 +9,7 @@ import 'package:ronditrack/features/home/presentation/home_screen.dart';
 import 'package:ronditrack/features/join/presentation/join_screen.dart';
 import 'package:ronditrack/features/profile/presentation/profile_screen.dart';
 import 'package:ronditrack/features/stokvel/presentation/cycle_screen.dart';
-import 'package:ronditrack/features/stokvel/presentation/stokvel_detail_screen.dart';
+import 'package:ronditrack/features/stokvel/presentation/stokvel_route_body.dart';
 import 'package:ronditrack/features/stokvel/presentation/stokvels_screen.dart';
 
 part 'routes.g.dart';
@@ -141,7 +141,7 @@ class StokvelRoute extends GoRouteData with $StokvelRoute {
   Page<void> buildPage(BuildContext context, GoRouterState state) =>
       MaterialPage<void>(
         key: const ValueKey('stokvel-detail'),
-        child: StokvelDetailScreen(stokvelId: id),
+        child: StokvelRouteBody(stokvelId: id),
       );
 }
 
