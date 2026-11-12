@@ -13,7 +13,7 @@ Contract copy: `contract/schema.d.ts` is the openapi-typescript output of the AP
 4. **Due dates.** `currentCycle.dueDate` is date-only (`2026-10-31`, nullable), modelled as a UTC-midnight `DateTime`. `nextPayoutUtc` is an instant (the last moment of the month in Johannesburg, `21:59:59Z`). Both are shown as a date in South African time (UTC+2, no daylight saving).
 5. **Seed personas.** Sipho: Member of Ubuntu Savings Circle and Treasurer of Umoja Family Fund (one login, two roles). Nomsa: Admin of Umoja Family Fund. The platform admin (`admin@example.com`) stays out of stokvel membership, so it is the empty-Home persona. The fakes hold the same people and stokvels; contributors and amounts inside them are made-up fake data.
 
-Backend gaps found: `role` and cycle `status` are published as plain `string` in the OpenAPI document, not as enums, so the contract does not list their spellings (only a description does). Recorded as a gap, not fixed this week: the app maps any unexpected string to `unknown`.
+Backend gaps found: `role` and cycle `status` were published as plain `string` in the OpenAPI document, so the contract did not list their spellings. Fixed in the API repo with a contract test: https://github.com/AndiswaMbonambi08/RondiTrack/pull/20. The app still maps any unexpected string to `unknown`.
 
 ## Running it
 
