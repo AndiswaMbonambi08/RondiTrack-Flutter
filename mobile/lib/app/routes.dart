@@ -39,7 +39,6 @@ class SignInRoute extends GoRouteData with $SignInRoute {
       SignInScreen(from: from);
 }
 
-@TypedGoRoute<JoinRoute>(path: '/join/:code')
 class JoinRoute extends GoRouteData with $JoinRoute {
   const new({required this.code});
 
@@ -53,7 +52,14 @@ class JoinRoute extends GoRouteData with $JoinRoute {
 @TypedStatefulShellRoute<AppShellRoute>(
   branches: <TypedStatefulShellBranch<StatefulShellBranchData>>[
     TypedStatefulShellBranch<HomeBranch>(
-      routes: <TypedRoute<RouteData>>[TypedGoRoute<HomeRoute>(path: '/')],
+      routes: <TypedRoute<RouteData>>[
+        TypedGoRoute<HomeRoute>(
+          path: '/',
+          routes: <TypedRoute<RouteData>>[
+            TypedGoRoute<JoinRoute>(path: 'join/:code'),
+          ],
+        ),
+      ],
     ),
     TypedStatefulShellBranch<StokvelsBranch>(
       routes: <TypedRoute<RouteData>>[
