@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ronditrack/app/routes.dart';
 import 'package:ronditrack/core/format_date.dart';
+import 'package:ronditrack/core/money/cents.dart';
 import 'package:ronditrack/core/money/money_format.dart';
+import 'package:ronditrack/core/status_chip.dart';
+import 'package:ronditrack/core/theme/status_colors.dart';
 import 'package:ronditrack/core/view_state.dart';
 import 'package:ronditrack/core/widgets.dart';
 import 'package:ronditrack/features/home/application/home_providers.dart';
 import 'package:ronditrack/features/home/domain/home_entry.dart';
 import 'package:ronditrack/features/home/presentation/persona_menu.dart';
 import 'package:ronditrack/features/stokvel/presentation/labels.dart';
-import 'package:ronditrack/features/stokvel/presentation/stokvel_detail_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const new({super.key});
@@ -82,11 +85,7 @@ class _StokvelCard extends StatelessWidget {
     final next = entry.nextPayout;
     return Card(
       child: InkWell(
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => StokvelDetailScreen(stokvelId: entry.stokvelId),
-          ),
-        ),
+        onTap: () => StokvelRoute(id: entry.stokvelId).go(context),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -97,7 +96,7 @@ class _StokvelCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text('Paid: ${formatRands(entry.paid)}'),
               Text('Owed: ${formatRands(entry.owed)}'),
-              Text('Arrears: ${formatRands(entry.arrears)}'),
+              _ArrearsLine(entry: entry),
               Text(
                 next == null
                     ? 'Next payout: none scheduled'
@@ -106,6 +105,26 @@ class _StokvelCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ArrearsLine extends StatelessWidget {
+  const new({required this.entry});
+
+  final HomeEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = 'Arrears: ${formatRands(entry.arrears)}';
+    if (entry.arrears == Cents.zero) return Text(text);
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: StatusChip(
+        label: text,
+        icon: Icons.warning_amber,
+        style: context.statusColors.arrears,
       ),
     );
   }
