@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ronditrack/app/routes.dart';
 import 'package:ronditrack/core/format_date.dart';
 import 'package:ronditrack/core/money/money_format.dart';
 import 'package:ronditrack/core/view_state.dart';
@@ -12,27 +13,19 @@ import 'package:ronditrack/features/stokvel/domain/enums.dart';
 import 'package:ronditrack/features/stokvel/domain/models.dart';
 import 'package:ronditrack/features/stokvel/presentation/labels.dart';
 
-class StokvelDetailScreen extends ConsumerStatefulWidget {
+/// The stokvel comes from the address. Switching stokvel changes the address,
+/// and the data is keyed by id, so another stokvel's data never shows here.
+class StokvelDetailScreen extends ConsumerWidget {
   const new({required this.stokvelId, super.key});
 
   final String stokvelId;
 
   @override
-  ConsumerState<StokvelDetailScreen> createState() =>
-      _StokvelDetailScreenState();
-}
-
-class _StokvelDetailScreenState extends ConsumerState<StokvelDetailScreen> {
-  late String _id = widget.stokvelId;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final entries =
         ref.watch(homeControllerProvider).value ?? const <HomeEntry>[];
-    // Keyed by id: a new id is a brand new provider state, so the previous
-    // stokvel's data can never show under this one.
     final state = toViewState<StokvelDetail>(
-      ref.watch(stokvelDetailProvider(_id)),
+      ref.watch(stokvelDetailProvider(stokvelId)),
       isEmpty: (detail) => detail.contributions.isEmpty,
     );
     return Scaffold(
@@ -43,7 +36,7 @@ class _StokvelDetailScreenState extends ConsumerState<StokvelDetailScreen> {
             PopupMenuButton<String>(
               icon: const Icon(Icons.swap_horiz),
               tooltip: 'Switch stokvel',
-              onSelected: (id) => setState(() => _id = id),
+              onSelected: (id) => StokvelRoute(id: id).go(context),
               itemBuilder: (_) => [
                 for (final e in entries)
                   PopupMenuItem(value: e.stokvelId, child: Text(e.name)),
@@ -57,7 +50,7 @@ class _StokvelDetailScreenState extends ConsumerState<StokvelDetailScreen> {
         ViewData(:final data) => _DetailBody(detail: data),
         ViewFailure(:final message) => FailureView(
           message: message,
-          onRetry: () => ref.invalidate(stokvelDetailProvider(_id)),
+          onRetry: () => ref.invalidate(stokvelDetailProvider(stokvelId)),
         ),
       },
     );
@@ -102,6 +95,16 @@ class _DetailBody extends StatelessWidget {
                 ),
           ],
         ),
+        if (cycle != null)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('View cycle'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => CycleRoute(
+              id: detail.stokvel.id,
+              cycleId: cycle.id,
+            ).go(context),
+          ),
         const Divider(height: 32),
         for (final c in detail.contributions)
           ListTile(

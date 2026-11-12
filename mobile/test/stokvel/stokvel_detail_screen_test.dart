@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ronditrack/app/routes.dart';
 import 'package:ronditrack/features/home/application/home_providers.dart';
 import 'package:ronditrack/features/home/data/fake_home_repository.dart';
 import 'package:ronditrack/features/stokvel/application/stokvel_providers.dart';
@@ -79,6 +80,11 @@ void main() {
 
   testWidgets('never the wrong stokvel, not for a frame', (tester) async {
     final slow = Completer<StokvelDetail>();
+    final router = createRouter(
+      isSignedIn: () => true,
+      initialLocation: '/stokvels/ubuntu-savings-circle',
+    );
+    addTearDown(router.dispose);
     await tester.pumpWidget(
       ProviderScope(
         retry: (retryCount, error) => null,
@@ -92,9 +98,7 @@ void main() {
             ),
           ),
         ],
-        child: const MaterialApp(
-          home: StokvelDetailScreen(stokvelId: 'ubuntu-savings-circle'),
-        ),
+        child: MaterialApp.router(routerConfig: router),
       ),
     );
     await tester.pumpAndSettle();
@@ -110,7 +114,7 @@ void main() {
     expect(find.text('Zanele'), findsNothing);
     expect(
       find.descendant(
-        of: find.byType(ListView),
+        of: find.byType(StokvelDetailScreen),
         matching: find.text('Ubuntu Savings Circle'),
       ),
       findsNothing,

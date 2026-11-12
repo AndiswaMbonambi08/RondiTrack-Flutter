@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ronditrack/app/routes.dart';
 import 'package:ronditrack/core/format_date.dart';
 import 'package:ronditrack/core/money/money_format.dart';
 import 'package:ronditrack/core/view_state.dart';
@@ -8,7 +9,6 @@ import 'package:ronditrack/features/home/application/home_providers.dart';
 import 'package:ronditrack/features/home/domain/home_entry.dart';
 import 'package:ronditrack/features/home/presentation/persona_menu.dart';
 import 'package:ronditrack/features/stokvel/presentation/labels.dart';
-import 'package:ronditrack/features/stokvel/presentation/stokvel_detail_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const new({super.key});
@@ -82,11 +82,7 @@ class _StokvelCard extends StatelessWidget {
     final next = entry.nextPayout;
     return Card(
       child: InkWell(
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => StokvelDetailScreen(stokvelId: entry.stokvelId),
-          ),
-        ),
+        onTap: () => StokvelRoute(id: entry.stokvelId).go(context),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
