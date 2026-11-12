@@ -181,3 +181,17 @@ Tokens Material does not have live in a `ThemeExtension` (`StatusColors`): one p
 | unknown | dark | #D0D0D0 on #2E2E2E: 8.80:1 | #D0D0D0 on #101411: 12.05:1 |
 | arrears | light | #7A1212 on #FFE1E0: 8.89:1 | #7A1212 on #FBFDF8: 10.67:1 |
 | arrears | dark | #FFB4AE on #4A1010: 9.03:1 | #FFB4AE on #101411: 10.96:1 |
+
+## Layouts
+
+Breakpoints are written once in `lib/core/layout/breakpoints.dart` and come from the window width, not the device. Nothing asks "is this a tablet?".
+
+| Window width | Class | Navigation | Stokvels |
+| --- | --- | --- | --- |
+| under 600 dp | compact | bottom bar, four labelled destinations | list, then the stokvel full screen |
+| 600 to 839 dp | medium | side rail, same four branches and labels | list, then the stokvel full screen |
+| 840 dp or wider | expanded | side rail | list and the selected stokvel side by side, on `/stokvels/:id` |
+
+The selected stokvel is in the address, so turning a tablet upright (under 840 dp) keeps that stokvel full screen, and back returns to the list. Side by side, back also returns to the list, with "Select a stokvel" on the right.
+
+Layout tests (`test/layout/layout_test.dart`) fail on overflow: Home, the stokvel list and stokvel detail at 360 by 640 dp with text at 200%, every action still reachable, and the list and detail side by side at 1280 by 800.
