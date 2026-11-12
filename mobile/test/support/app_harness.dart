@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ronditrack/app/router.dart';
 import 'package:ronditrack/core/session/session.dart';
+import 'package:ronditrack/core/theme/app_theme.dart';
 import 'package:ronditrack/features/activity/application/activity_providers.dart';
 import 'package:ronditrack/features/activity/data/fake_activity_repository.dart';
 import 'package:ronditrack/features/home/application/home_providers.dart';
@@ -24,24 +25,43 @@ class AppHarness {
     await tester.pumpAndSettle();
   }
 
+  /// Android's back gesture.
+  Future<void> back() async {
+    container.read(routerProvider).pop();
+    await tester.pumpAndSettle();
+  }
+
+  /// Changes the window while the app is running, like turning a tablet.
+  Future<void> resize(Size size) async {
+    tester.view.physicalSize = size;
+    await tester.pumpAndSettle();
+  }
+
   Future<void> signInAs(String personaId) async {
     container.read(authProvider.notifier).signInAs(personaId);
     await tester.pumpAndSettle();
   }
 
   Future<void> tapTab(String label) async {
-    await tester.tap(
-      find.descendant(
-        of: find.byType(NavigationBar),
-        matching: find.text(label),
-      ),
-    );
+    final bar = find.byType(NavigationBar).evaluate().isNotEmpty
+        ? find.byType(NavigationBar)
+        : find.byType(NavigationRail);
+    await tester.tap(find.descendant(of: bar, matching: find.text(label)));
     await tester.pumpAndSettle();
   }
 }
 
-/// Starts the app signed out. Pass [signedInAs] to sign in first.
-Future<AppHarness> pumpApp(WidgetTester tester, {String? signedInAs}) async {
+/// Starts the app signed out in a [size] dp window (a compact phone by
+/// default). Pass [signedInAs] to sign in first and [textScale] for large text.
+Future<AppHarness> pumpApp(
+  WidgetTester tester, {
+  String? signedInAs,
+  Size size = const Size(400, 800),
+  double textScale = 1,
+}) async {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = size;
+  addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
       retry: (retryCount, error) => null,
@@ -72,8 +92,16 @@ Future<AppHarness> pumpApp(WidgetTester tester, {String? signedInAs}) async {
         ),
       ],
       child: Consumer(
-        builder: (context, ref, _) =>
-            MaterialApp.router(routerConfig: ref.watch(routerProvider)),
+        builder: (context, ref, _) => MaterialApp.router(
+          theme: buildTheme(Brightness.light),
+          darkTheme: buildTheme(Brightness.dark),
+          routerConfig: ref.watch(routerProvider),
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(textScale)),
+            child: child!,
+          ),
+        ),
       ),
     ),
   );
