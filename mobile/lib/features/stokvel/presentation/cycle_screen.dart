@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ronditrack/core/format_date.dart';
-import 'package:ronditrack/core/money/money_format.dart';
 import 'package:ronditrack/core/view_state.dart';
 import 'package:ronditrack/core/widgets.dart';
 import 'package:ronditrack/features/stokvel/application/stokvel_providers.dart';
 import 'package:ronditrack/features/stokvel/domain/models.dart';
-import 'package:ronditrack/features/stokvel/presentation/labels.dart';
+import 'package:ronditrack/features/stokvel/presentation/contribution_tile.dart';
+import 'package:ronditrack/features/stokvel/presentation/status_chips.dart';
 
 /// A cycle sits under its stokvel. A stokvel the person is not in, or a cycle
 /// id from another stokvel, reads as not found.
@@ -67,15 +67,18 @@ class _CycleBody extends StatelessWidget {
           detail.stokvel.name,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
-        Text('Cycle ${cycle.number}: ${cycleLabel(cycle.status)}'),
+        Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text('Cycle ${cycle.number}'),
+            CycleStatusChip(status: cycle.status),
+          ],
+        ),
         Text('Due ${formatDate(cycle.dueDate)}'),
         const Divider(height: 32),
-        for (final c in detail.contributions)
-          ListTile(
-            title: Text(c.memberName),
-            subtitle: Text(contributionLabel(c.status)),
-            trailing: Text(formatRands(c.amount)),
-          ),
+        for (final c in detail.contributions) ContributionTile(contribution: c),
       ],
     );
   }

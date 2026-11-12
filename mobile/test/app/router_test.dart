@@ -46,7 +46,7 @@ void main() {
     testWidgets('the same cycle under its own stokvel opens', (tester) async {
       final app = await pumpApp(tester, signedInAs: 'sipho');
       await app.go('/stokvels/umoja-family-fund/cycles/cycle-umoja-5');
-      expect(find.text('Cycle 5: Open'), findsOneWidget);
+      expect(find.text('Cycle 5'), findsOneWidget);
     });
   });
 
@@ -120,7 +120,7 @@ void main() {
     ) async {
       final app = await pumpApp(tester, signedInAs: 'sipho');
       await app.go('/stokvels/umoja-family-fund/cycles/cycle-umoja-5');
-      expect(find.text('Cycle 5: Open'), findsOneWidget);
+      expect(find.text('Cycle 5'), findsOneWidget);
 
       await app.tapTab('Activity');
       expect(
@@ -130,10 +130,10 @@ void main() {
         ),
         findsOneWidget,
       );
-      expect(find.text('Cycle 5: Open'), findsNothing);
+      expect(find.text('Cycle 5'), findsNothing);
 
       await app.tapTab('Stokvels');
-      expect(find.text('Cycle 5: Open'), findsOneWidget);
+      expect(find.text('Cycle 5'), findsOneWidget);
     });
 
     testWidgets('tapping the tab you are on returns to its first screen', (
@@ -142,7 +142,7 @@ void main() {
       final app = await pumpApp(tester, signedInAs: 'sipho');
       await app.go('/stokvels/umoja-family-fund/cycles/cycle-umoja-5');
       await app.tapTab('Stokvels');
-      expect(find.text('Cycle 5: Open'), findsNothing);
+      expect(find.text('Cycle 5'), findsNothing);
       expect(
         find.descendant(
           of: find.byType(AppBar),

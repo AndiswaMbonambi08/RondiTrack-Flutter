@@ -4,7 +4,7 @@ import 'package:ronditrack/core/view_state.dart';
 import 'package:ronditrack/core/widgets.dart';
 import 'package:ronditrack/features/activity/application/activity_providers.dart';
 import 'package:ronditrack/features/activity/domain/activity_item.dart';
-import 'package:ronditrack/features/stokvel/presentation/labels.dart';
+import 'package:ronditrack/features/stokvel/presentation/status_chips.dart';
 
 class ActivityScreen extends ConsumerWidget {
   const new({super.key});
@@ -26,8 +26,13 @@ class ActivityScreen extends ConsumerWidget {
             for (final item in data)
               ListTile(
                 title: Text(item.memberName),
-                subtitle: Text(
-                  '${item.stokvelName}: ${contributionLabel(item.status)}',
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item.stokvelName),
+                    const SizedBox(height: 4),
+                    ContributionStatusChip(status: item.status),
+                  ],
                 ),
               ),
           ],
