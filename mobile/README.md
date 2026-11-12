@@ -94,3 +94,14 @@ Every screen has an address. A signed-out visit to any address goes to sign-in a
 | anything else | "Page not found" with a Go to Home button | Sign-in, nothing remembered | Not applicable | Home |
 
 **Tapping the tab you are on** returns to that tab's first screen (`goBranch(initialLocation: true)`). Tapping a different tab keeps that tab's stack and scroll position. Both are tested.
+
+## The gate
+
+One pure function, `redirectFor(signedIn, location)` in `lib/app/redirect.dart`, decides every navigation. It needs no widget, so `test/app/redirect_test.dart` tests it directly.
+
+- **Signed out:** every address except `/sign-in` goes to `/sign-in`. If the address is inside the app and is not Home, it travels along as `?from=<address>`.
+- **Signed in, on `/sign-in`:** go to `from` if it is an address inside the app, otherwise Home.
+- **Signed in, anywhere else:** nothing changes.
+- **What is remembered:** only an address that starts with a single `/`, has no scheme or host, and begins with a known root (`stokvels`, `activity`, `profile`, `join`). `https://...`, `//host`, `javascript:` and unknown paths land on Home.
+- **When it runs:** the router listens to a notifier that bumps whenever the auth provider changes (`refreshListenable`), so signing out redirects immediately, not on the next tap. After sign-out the signed-in screens are gone from the stack, so back cannot return to them.
+- **Week 11:** the fake `Auth` provider is replaced by the API. The gate only reads "signed in or not", so it does not change.
