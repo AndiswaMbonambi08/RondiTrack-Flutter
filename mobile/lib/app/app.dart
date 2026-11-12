@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ronditrack/app/config.dart';
 import 'package:ronditrack/app/router.dart';
+import 'package:ronditrack/core/theme/app_theme.dart';
 
 class RondiTrackApp extends ConsumerWidget {
   const new({required this.config, super.key});
@@ -14,7 +15,8 @@ class RondiTrackApp extends ConsumerWidget {
       title: config.flavor == Flavor.prod
           ? 'RondiTrack'
           : 'RondiTrack ${config.flavor.name}',
-      theme: ThemeData(colorSchemeSeed: Colors.green),
+      theme: buildTheme(Brightness.light),
+      darkTheme: buildTheme(Brightness.dark),
       routerConfig: ref.watch(routerProvider),
     );
   }
