@@ -105,3 +105,50 @@ One pure function, `redirectFor(signedIn, location)` in `lib/app/redirect.dart`,
 - **What is remembered:** only an address that starts with a single `/`, has no scheme or host, and begins with a known root (`stokvels`, `activity`, `profile`, `join`). `https://...`, `//host`, `javascript:` and unknown paths land on Home.
 - **When it runs:** the router listens to a notifier that bumps whenever the auth provider changes (`refreshListenable`), so signing out redirects immediately, not on the next tap. After sign-out the signed-in screens are gone from the stack, so back cannot return to them.
 - **Week 11:** the fake `Auth` provider is replaced by the API. The gate only reads "signed in or not", so it does not change.
+
+## Deep links
+
+**Choice: a custom scheme**, `ronditrack://<applicationId>/<path>`. The host is the flavour's own application id, filled in by Gradle (`${applicationId}`) in the manifest's intent filter, so a link aimed at the dev build can only be claimed by the dev build. Flutter hands the router the path and query, so `/stokvels/:id`, `/stokvels/:id/cycles/:cycleId` and `/join/:code` open the same screens as in the app, while it is running and from a cold start. Signed out, the link goes to sign-in and then on to the address.
+
+**dev** (application id `za.co.andiswa.ronditrack.dev`)
+
+```powershell
+# cold start: force-stop first, then open each link
+adb shell am force-stop za.co.andiswa.ronditrack.dev
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.dev/stokvels/umoja-family-fund" za.co.andiswa.ronditrack.dev
+adb shell am force-stop za.co.andiswa.ronditrack.dev
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.dev/stokvels/umoja-family-fund/cycles/cycle-umoja-5" za.co.andiswa.ronditrack.dev
+adb shell am force-stop za.co.andiswa.ronditrack.dev
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.dev/join/ubuntu2026" za.co.andiswa.ronditrack.dev
+```
+
+**staging** (application id `za.co.andiswa.ronditrack.staging`)
+
+```powershell
+# cold start: force-stop first, then open each link
+adb shell am force-stop za.co.andiswa.ronditrack.staging
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.staging/stokvels/umoja-family-fund" za.co.andiswa.ronditrack.staging
+adb shell am force-stop za.co.andiswa.ronditrack.staging
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.staging/stokvels/umoja-family-fund/cycles/cycle-umoja-5" za.co.andiswa.ronditrack.staging
+adb shell am force-stop za.co.andiswa.ronditrack.staging
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.staging/join/ubuntu2026" za.co.andiswa.ronditrack.staging
+```
+
+**prod** (application id `za.co.andiswa.ronditrack`)
+
+```powershell
+# cold start: force-stop first, then open each link
+adb shell am force-stop za.co.andiswa.ronditrack
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack/stokvels/umoja-family-fund" za.co.andiswa.ronditrack
+adb shell am force-stop za.co.andiswa.ronditrack
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack/stokvels/umoja-family-fund/cycles/cycle-umoja-5" za.co.andiswa.ronditrack
+adb shell am force-stop za.co.andiswa.ronditrack
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack/join/ubuntu2026" za.co.andiswa.ronditrack
+```
+
+
+Force-stop before each link, or you are only testing a running app. Back from the cycle link goes to the stokvel, then the list. Back from the invite link goes to Home.
+
+**What a verified App Link would add.** An `https://` link that opens the app directly with no chooser, and nothing else can claim it. It needs a domain I own, a `/.well-known/assetlinks.json` file on it listing each flavour's package name and signing certificate fingerprint, and `android:autoVerify="true"` on an `https` intent filter. Anyone tapping the link without the app installed would land on a web page instead of a dead end.
+
+**What an `adb` test does and does not prove.** It proves the intent filter matches, the right flavour is chosen by its application id, the cold start builds the right back stack and the redirect keeps the address through sign-in. It does not prove domain ownership or verification, how a messaging app, browser or email client treats the link, or that another app has not claimed the same scheme (a custom scheme is not exclusive).
