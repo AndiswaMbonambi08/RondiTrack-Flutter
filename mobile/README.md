@@ -76,3 +76,21 @@ To prove CI catches what only `riverpod_lint` reports, pull request #3 (`ci-demo
 - Pull request: https://github.com/AndiswaMbonambi08/RondiTrack-Flutter/pull/3
 
 `flutter analyze` alone would have let it through. It does not load analyser plugins, so `riverpod_lint` never runs under it. Only `dart analyze` loads the plugin, which is why CI runs `dart analyze --fatal-infos`.
+
+## Routes
+
+Every screen has an address. A signed-out visit to any address goes to sign-in and then comes back to it. Typed routes (`go_router_builder`) are the only way widgets navigate: there is no string path and no `Navigator.push`.
+
+| Address | Screen and tab | Signed out | Not a member | Back goes to |
+| --- | --- | --- | --- | --- |
+| `/` | Home, Home tab | Sign-in, then `/` | Only your own stokvels are listed | Leaves the app |
+| `/stokvels` | Stokvel list, Stokvels tab | Sign-in, then `/stokvels` | Only your own stokvels are listed | Leaves the app |
+| `/stokvels/:id` | Stokvel detail, Stokvels tab. At 840 dp or wider it is the list and the detail side by side | Sign-in, then this address | "Stokvel not found", the same screen as for a stokvel that does not exist | `/stokvels` (the detail sits on the list, also from a cold start) |
+| `/stokvels/:id/cycles/:cycleId` | Cycle, Stokvels tab | Sign-in, then this address | "Stokvel not found". A cycle id from a different stokvel: "Cycle not found" | `/stokvels/:id`, then `/stokvels` |
+| `/activity` | Activity tab | Sign-in, then `/activity` | Only your own stokvels' contributions are listed | Leaves the app |
+| `/profile` | Profile tab, with sign out | Sign-in, then `/profile` | Not applicable | Leaves the app |
+| `/join/:code` | Invitation preview, on top of Home | Sign-in, then this address | Unknown code: "Invitation not found" | `/` (Home) |
+| `/sign-in` (`?from=`) | Sign-in, no tabs | Stays | Not applicable | Leaves the app. Signed in: goes to `from` when it is inside the app, else `/` |
+| anything else | "Page not found" with a Go to Home button | Sign-in, nothing remembered | Not applicable | Home |
+
+**Tapping the tab you are on** returns to that tab's first screen (`goBranch(initialLocation: true)`). Tapping a different tab keeps that tab's stack and scroll position. Both are tested.
