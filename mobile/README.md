@@ -152,3 +152,32 @@ Force-stop before each link, or you are only testing a running app. Back from th
 **What a verified App Link would add.** An `https://` link that opens the app directly with no chooser, and nothing else can claim it. It needs a domain I own, a `/.well-known/assetlinks.json` file on it listing each flavour's package name and signing certificate fingerprint, and `android:autoVerify="true"` on an `https` intent filter. Anyone tapping the link without the app installed would land on a web page instead of a dead end.
 
 **What an `adb` test does and does not prove.** It proves the intent filter matches, the right flavour is chosen by its application id, the cold start builds the right back stack and the redirect keeps the address through sign-in. It does not prove domain ownership or verification, how a messaging app, browser or email client treats the link, or that another app has not claimed the same scheme (a custom scheme is not exclusive).
+
+## Theme
+
+**Seed colour:** `#1B6B4A`, a deep green, in `lib/core/theme/app_theme.dart`. Material 3 builds the light and dark schemes from it and the app follows the phone's setting. The page colours (`surface`, `onSurface`) are set from the tokens, so the table below is the contrast on screen.
+
+Tokens Material does not have live in a `ThemeExtension` (`StatusColors`): one pair per contribution status (`pending`, `paid`, `confirmed`), per cycle status (`open`, `closed`, `paidOut`, `unknown`) and `arrears`, each with its own light and dark values. Widgets ask `context.statusColors.arrears`, never for a red. Every chip says its status in words with an icon, and `test/theme/no_typed_colours_test.dart` fails if a colour is typed anywhere outside `lib/core/theme`.
+
+**Contrast, measured.** Checker: the WCAG 2.x relative-luminance formula in `tool/contrast_table.dart` (regenerate this table with `dart run tool/contrast_table.dart`). `test/theme/contrast_test.dart` fails the build if any chip text drops under 4.5:1 or any chip border under 3:1 against the page, in either theme.
+
+| Token | Theme | Text on its chip (needs 4.5:1) | Border on the page (needs 3:1) |
+| --- | --- | --- | --- |
+| body text | light | #191C1A on #FBFDF8: 16.78:1 | n/a |
+| body text | dark | #E0E4DF on #101411: 14.45:1 | n/a |
+| pending | light | #5F4100 on #FFF0CC: 8.29:1 | #5F4100 on #FBFDF8: 9.14:1 |
+| pending | dark | #FFD98A on #3D2C00: 9.97:1 | #FFD98A on #101411: 13.75:1 |
+| paid | light | #0B3D66 on #DCEEFF: 9.46:1 | #0B3D66 on #FBFDF8: 10.95:1 |
+| paid | dark | #A9D4FF on #0E2F4F: 8.81:1 | #A9D4FF on #101411: 11.99:1 |
+| confirmed | light | #0F4D2A on #D9F5E3: 8.57:1 | #0F4D2A on #FBFDF8: 9.69:1 |
+| confirmed | dark | #A6E8C0 on #0D3320: 9.87:1 | #A6E8C0 on #101411: 13.21:1 |
+| open | light | #00464A on #D4F3F5: 9.08:1 | #00464A on #FBFDF8: 10.38:1 |
+| open | dark | #9FE8EC on #00373A: 9.47:1 | #9FE8EC on #101411: 13.47:1 |
+| closed | light | #3A3F44 on #E6E9EC: 8.73:1 | #3A3F44 on #FBFDF8: 10.39:1 |
+| closed | dark | #D3D8DD on #2B3035: 9.28:1 | #D3D8DD on #101411: 12.95:1 |
+| paidOut | light | #3F1D7A on #EBE3FF: 10.17:1 | #3F1D7A on #FBFDF8: 12.29:1 |
+| paidOut | dark | #D9C8FF on #2A1A55: 9.91:1 | #D9C8FF on #101411: 12.08:1 |
+| unknown | light | #4A4A4A on #EFEFEF: 7.71:1 | #4A4A4A on #FBFDF8: 8.65:1 |
+| unknown | dark | #D0D0D0 on #2E2E2E: 8.80:1 | #D0D0D0 on #101411: 12.05:1 |
+| arrears | light | #7A1212 on #FFE1E0: 8.89:1 | #7A1212 on #FBFDF8: 10.67:1 |
+| arrears | dark | #FFB4AE on #4A1010: 9.03:1 | #FFB4AE on #101411: 10.96:1 |
