@@ -10,7 +10,7 @@ class PersonaMenu extends ConsumerWidget {
     return PopupMenuButton<String>(
       icon: const Icon(Icons.person),
       tooltip: 'Switch person',
-      onSelected: (id) => ref.read(currentPersonaProvider.notifier).select(id),
+      onSelected: (id) => ref.read(authProvider.notifier).signInAs(id),
       itemBuilder: (_) => [
         for (final p in personas)
           PopupMenuItem(value: p.id, child: Text(p.name)),

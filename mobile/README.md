@@ -76,3 +76,122 @@ To prove CI catches what only `riverpod_lint` reports, pull request #3 (`ci-demo
 - Pull request: https://github.com/AndiswaMbonambi08/RondiTrack-Flutter/pull/3
 
 `flutter analyze` alone would have let it through. It does not load analyser plugins, so `riverpod_lint` never runs under it. Only `dart analyze` loads the plugin, which is why CI runs `dart analyze --fatal-infos`.
+
+## Routes
+
+Every screen has an address. A signed-out visit to any address goes to sign-in and then comes back to it. Typed routes (`go_router_builder`) are the only way widgets navigate: there is no string path and no `Navigator.push`.
+
+| Address | Screen and tab | Signed out | Not a member | Back goes to |
+| --- | --- | --- | --- | --- |
+| `/` | Home, Home tab | Sign-in, then `/` | Only your own stokvels are listed | Leaves the app |
+| `/stokvels` | Stokvel list, Stokvels tab | Sign-in, then `/stokvels` | Only your own stokvels are listed | Leaves the app |
+| `/stokvels/:id` | Stokvel detail, Stokvels tab. At 840 dp or wider it is the list and the detail side by side | Sign-in, then this address | "Stokvel not found", the same screen as for a stokvel that does not exist | `/stokvels` (the detail sits on the list, also from a cold start) |
+| `/stokvels/:id/cycles/:cycleId` | Cycle, Stokvels tab | Sign-in, then this address | "Stokvel not found". A cycle id from a different stokvel: "Cycle not found" | `/stokvels/:id`, then `/stokvels` |
+| `/activity` | Activity tab | Sign-in, then `/activity` | Only your own stokvels' contributions are listed | Leaves the app |
+| `/profile` | Profile tab, with sign out | Sign-in, then `/profile` | Not applicable | Leaves the app |
+| `/join/:code` | Invitation preview, on top of Home | Sign-in, then this address | Unknown code: "Invitation not found" | `/` (Home) |
+| `/sign-in` (`?from=`) | Sign-in, no tabs | Stays | Not applicable | Leaves the app. Signed in: goes to `from` when it is inside the app, else `/` |
+| anything else | "Page not found" with a Go to Home button | Sign-in, nothing remembered | Not applicable | Home |
+
+**Tapping the tab you are on** returns to that tab's first screen (`goBranch(initialLocation: true)`). Tapping a different tab keeps that tab's stack and scroll position. Both are tested.
+
+## The gate
+
+One pure function, `redirectFor(signedIn, location)` in `lib/app/redirect.dart`, decides every navigation. It needs no widget, so `test/app/redirect_test.dart` tests it directly.
+
+- **Signed out:** every address except `/sign-in` goes to `/sign-in`. If the address is inside the app and is not Home, it travels along as `?from=<address>`.
+- **Signed in, on `/sign-in`:** go to `from` if it is an address inside the app, otherwise Home.
+- **Signed in, anywhere else:** nothing changes.
+- **What is remembered:** only an address that starts with a single `/`, has no scheme or host, and begins with a known root (`stokvels`, `activity`, `profile`, `join`). `https://...`, `//host`, `javascript:` and unknown paths land on Home.
+- **When it runs:** the router listens to a notifier that bumps whenever the auth provider changes (`refreshListenable`), so signing out redirects immediately, not on the next tap. After sign-out the signed-in screens are gone from the stack, so back cannot return to them.
+- **Week 11:** the fake `Auth` provider is replaced by the API. The gate only reads "signed in or not", so it does not change.
+
+## Deep links
+
+**Choice: a custom scheme**, `ronditrack://<applicationId>/<path>`. The host is the flavour's own application id, filled in by Gradle (`${applicationId}`) in the manifest's intent filter, so a link aimed at the dev build can only be claimed by the dev build. Flutter hands the router the path and query, so `/stokvels/:id`, `/stokvels/:id/cycles/:cycleId` and `/join/:code` open the same screens as in the app, while it is running and from a cold start. Signed out, the link goes to sign-in and then on to the address.
+
+**dev** (application id `za.co.andiswa.ronditrack.dev`)
+
+```powershell
+# cold start: force-stop first, then open each link
+adb shell am force-stop za.co.andiswa.ronditrack.dev
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.dev/stokvels/umoja-family-fund" za.co.andiswa.ronditrack.dev
+adb shell am force-stop za.co.andiswa.ronditrack.dev
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.dev/stokvels/umoja-family-fund/cycles/cycle-umoja-5" za.co.andiswa.ronditrack.dev
+adb shell am force-stop za.co.andiswa.ronditrack.dev
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.dev/join/ubuntu2026" za.co.andiswa.ronditrack.dev
+```
+
+**staging** (application id `za.co.andiswa.ronditrack.staging`)
+
+```powershell
+# cold start: force-stop first, then open each link
+adb shell am force-stop za.co.andiswa.ronditrack.staging
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.staging/stokvels/umoja-family-fund" za.co.andiswa.ronditrack.staging
+adb shell am force-stop za.co.andiswa.ronditrack.staging
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.staging/stokvels/umoja-family-fund/cycles/cycle-umoja-5" za.co.andiswa.ronditrack.staging
+adb shell am force-stop za.co.andiswa.ronditrack.staging
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack.staging/join/ubuntu2026" za.co.andiswa.ronditrack.staging
+```
+
+**prod** (application id `za.co.andiswa.ronditrack`)
+
+```powershell
+# cold start: force-stop first, then open each link
+adb shell am force-stop za.co.andiswa.ronditrack
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack/stokvels/umoja-family-fund" za.co.andiswa.ronditrack
+adb shell am force-stop za.co.andiswa.ronditrack
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack/stokvels/umoja-family-fund/cycles/cycle-umoja-5" za.co.andiswa.ronditrack
+adb shell am force-stop za.co.andiswa.ronditrack
+adb shell am start -W -a android.intent.action.VIEW -d "ronditrack://za.co.andiswa.ronditrack/join/ubuntu2026" za.co.andiswa.ronditrack
+```
+
+
+Force-stop before each link, or you are only testing a running app. Back from the cycle link goes to the stokvel, then the list. Back from the invite link goes to Home.
+
+**What a verified App Link would add.** An `https://` link that opens the app directly with no chooser, and nothing else can claim it. It needs a domain I own, a `/.well-known/assetlinks.json` file on it listing each flavour's package name and signing certificate fingerprint, and `android:autoVerify="true"` on an `https` intent filter. Anyone tapping the link without the app installed would land on a web page instead of a dead end.
+
+**What an `adb` test does and does not prove.** It proves the intent filter matches, the right flavour is chosen by its application id, the cold start builds the right back stack and the redirect keeps the address through sign-in. It does not prove domain ownership or verification, how a messaging app, browser or email client treats the link, or that another app has not claimed the same scheme (a custom scheme is not exclusive).
+
+## Theme
+
+**Seed colour:** `#1B6B4A`, a deep green, in `lib/core/theme/app_theme.dart`. Material 3 builds the light and dark schemes from it and the app follows the phone's setting. The page colours (`surface`, `onSurface`) are set from the tokens, so the table below is the contrast on screen.
+
+Tokens Material does not have live in a `ThemeExtension` (`StatusColors`): one pair per contribution status (`pending`, `paid`, `confirmed`), per cycle status (`open`, `closed`, `paidOut`, `unknown`) and `arrears`, each with its own light and dark values. Widgets ask `context.statusColors.arrears`, never for a red. Every chip says its status in words with an icon, and `test/theme/no_typed_colours_test.dart` fails if a colour is typed anywhere outside `lib/core/theme`.
+
+**Contrast, measured.** Checker: the WCAG 2.x relative-luminance formula in `tool/contrast_table.dart` (regenerate this table with `dart run tool/contrast_table.dart`). `test/theme/contrast_test.dart` fails the build if any chip text drops under 4.5:1 or any chip border under 3:1 against the page, in either theme.
+
+| Token | Theme | Text on its chip (needs 4.5:1) | Border on the page (needs 3:1) |
+| --- | --- | --- | --- |
+| body text | light | #191C1A on #FBFDF8: 16.78:1 | n/a |
+| body text | dark | #E0E4DF on #101411: 14.45:1 | n/a |
+| pending | light | #5F4100 on #FFF0CC: 8.29:1 | #5F4100 on #FBFDF8: 9.14:1 |
+| pending | dark | #FFD98A on #3D2C00: 9.97:1 | #FFD98A on #101411: 13.75:1 |
+| paid | light | #0B3D66 on #DCEEFF: 9.46:1 | #0B3D66 on #FBFDF8: 10.95:1 |
+| paid | dark | #A9D4FF on #0E2F4F: 8.81:1 | #A9D4FF on #101411: 11.99:1 |
+| confirmed | light | #0F4D2A on #D9F5E3: 8.57:1 | #0F4D2A on #FBFDF8: 9.69:1 |
+| confirmed | dark | #A6E8C0 on #0D3320: 9.87:1 | #A6E8C0 on #101411: 13.21:1 |
+| open | light | #00464A on #D4F3F5: 9.08:1 | #00464A on #FBFDF8: 10.38:1 |
+| open | dark | #9FE8EC on #00373A: 9.47:1 | #9FE8EC on #101411: 13.47:1 |
+| closed | light | #3A3F44 on #E6E9EC: 8.73:1 | #3A3F44 on #FBFDF8: 10.39:1 |
+| closed | dark | #D3D8DD on #2B3035: 9.28:1 | #D3D8DD on #101411: 12.95:1 |
+| paidOut | light | #3F1D7A on #EBE3FF: 10.17:1 | #3F1D7A on #FBFDF8: 12.29:1 |
+| paidOut | dark | #D9C8FF on #2A1A55: 9.91:1 | #D9C8FF on #101411: 12.08:1 |
+| unknown | light | #4A4A4A on #EFEFEF: 7.71:1 | #4A4A4A on #FBFDF8: 8.65:1 |
+| unknown | dark | #D0D0D0 on #2E2E2E: 8.80:1 | #D0D0D0 on #101411: 12.05:1 |
+| arrears | light | #7A1212 on #FFE1E0: 8.89:1 | #7A1212 on #FBFDF8: 10.67:1 |
+| arrears | dark | #FFB4AE on #4A1010: 9.03:1 | #FFB4AE on #101411: 10.96:1 |
+
+## Layouts
+
+Breakpoints are written once in `lib/core/layout/breakpoints.dart` and come from the window width, not the device. Nothing asks "is this a tablet?".
+
+| Window width | Class | Navigation | Stokvels |
+| --- | --- | --- | --- |
+| under 600 dp | compact | bottom bar, four labelled destinations | list, then the stokvel full screen |
+| 600 to 839 dp | medium | side rail, same four branches and labels | list, then the stokvel full screen |
+| 840 dp or wider | expanded | side rail | list and the selected stokvel side by side, on `/stokvels/:id` |
+
+The selected stokvel is in the address, so turning a tablet upright (under 840 dp) keeps that stokvel full screen, and back returns to the list. Side by side, back also returns to the list, with "Select a stokvel" on the right.
+
+Layout tests (`test/layout/layout_test.dart`) fail on overflow: Home, the stokvel list and stokvel detail at 360 by 640 dp with text at 200%, every action still reachable, and the list and detail side by side at 1280 by 800.
