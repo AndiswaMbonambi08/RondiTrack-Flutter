@@ -13,6 +13,7 @@ class Persona {
 const personas = [
   Persona(id: 'sipho', name: 'Sipho'),
   Persona(id: 'nomsa', name: 'Nomsa'),
+  Persona(id: 'mpho', name: 'Mpho'),
   Persona(id: 'broken', name: 'Broken (dev)'),
   Persona(id: 'platform-admin', name: 'Platform admin'),
 ];
