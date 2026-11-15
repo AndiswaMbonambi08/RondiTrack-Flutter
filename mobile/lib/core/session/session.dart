@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart' show WidgetsBinding;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'session.g.dart';
@@ -57,6 +58,16 @@ class Auth extends _$Auth {
   void signInAs(String id) {
     ref.read(currentPersonaProvider.notifier).select(id);
     state = id;
+  }
+
+  /// The dev switcher's sign-in. It signs out first, so the last person's
+  /// screens are gone and their providers disposed before the next person's
+  /// first frame, then signs in again. The gate returns to the same address.
+  Future<void> switchTo(String id) async {
+    signOut();
+    await WidgetsBinding.instance.endOfFrame;
+    await WidgetsBinding.instance.endOfFrame;
+    signInAs(id);
   }
 
   void signOut() => state = null;

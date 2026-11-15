@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ronditrack/app/config_provider.dart';
 import 'package:ronditrack/core/layout/breakpoints.dart';
+import 'package:ronditrack/features/home/presentation/persona_menu.dart';
 
 const List<({IconData icon, String label, IconData selectedIcon})> _tabs = [
   (label: 'Home', icon: Icons.home_outlined, selectedIcon: Icons.home),
@@ -14,8 +17,10 @@ const List<({IconData icon, String label, IconData selectedIcon})> _tabs = [
 ];
 
 /// The same four branches everywhere: a bottom bar on compact windows, a side
-/// rail on wider ones, each destination with its label.
-class AppShell extends StatelessWidget {
+/// rail on wider ones, each destination with its label. In the dev flavour a
+/// persona switcher sits over every screen; in staging and prod it is not
+/// built at all.
+class AppShell extends ConsumerWidget {
   const new({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
@@ -27,8 +32,8 @@ class AppShell extends StatelessWidget {
   );
 
   @override
-  Widget build(BuildContext context) {
-    return switch (windowSizeOf(context)) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final shell = switch (windowSizeOf(context)) {
       WindowSize.compact => Scaffold(
         body: navigationShell,
         bottomNavigationBar: NavigationBar(
@@ -66,5 +71,22 @@ class AppShell extends StatelessWidget {
         ),
       ),
     };
+    if (!ref.watch(appConfigProvider).devToolsEnabled) return shell;
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        shell,
+        const PositionedDirectional(
+          top: 0,
+          end: 0,
+          child: SafeArea(
+            child: Material(
+              type: MaterialType.transparency,
+              child: PersonaMenu(),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

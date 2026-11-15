@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ronditrack/app/config.dart';
+import 'package:ronditrack/app/config_provider.dart';
 import 'package:ronditrack/app/retry.dart';
 import 'package:ronditrack/app/router.dart';
 import 'package:ronditrack/core/session/session.dart';
@@ -61,6 +63,7 @@ Future<AppHarness> pumpApp(
   String? signedInAs,
   Size size = const Size(400, 800),
   double textScale = 1,
+  Flavor flavor = Flavor.dev,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -69,6 +72,9 @@ Future<AppHarness> pumpApp(
     ProviderScope(
       retry: appRetry,
       overrides: [
+        appConfigProvider.overrideWithValue(
+          AppConfig(flavor: flavor, apiBaseUrl: 'http://localhost'),
+        ),
         homeRepositoryProvider.overrideWith(
           (ref) => FakeHomeRepository(
             personaId: ref.watch(currentPersonaProvider),

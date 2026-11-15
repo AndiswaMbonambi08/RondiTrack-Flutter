@@ -51,4 +51,7 @@ class AppConfig {
 
   final Flavor flavor;
   final String apiBaseUrl;
+
+  /// Dev-only tools (the persona switcher). Staging and prod build none.
+  bool get devToolsEnabled => flavor == Flavor.dev;
 }
