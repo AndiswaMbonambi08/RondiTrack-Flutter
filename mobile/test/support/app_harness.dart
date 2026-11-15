@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ronditrack/app/retry.dart';
 import 'package:ronditrack/app/router.dart';
 import 'package:ronditrack/core/session/session.dart';
 import 'package:ronditrack/core/theme/app_theme.dart';
@@ -10,6 +11,8 @@ import 'package:ronditrack/features/home/application/home_providers.dart';
 import 'package:ronditrack/features/home/data/fake_home_repository.dart';
 import 'package:ronditrack/features/join/application/join_providers.dart';
 import 'package:ronditrack/features/join/data/fake_invite_repository.dart';
+import 'package:ronditrack/features/payout/application/payout_providers.dart';
+import 'package:ronditrack/features/payout/data/fake_payout_repository.dart';
 import 'package:ronditrack/features/stokvel/application/stokvel_providers.dart';
 import 'package:ronditrack/features/stokvel/data/fake_stokvel_repository.dart';
 
@@ -64,7 +67,7 @@ Future<AppHarness> pumpApp(
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
-      retry: (retryCount, error) => null,
+      retry: appRetry,
       overrides: [
         homeRepositoryProvider.overrideWith(
           (ref) => FakeHomeRepository(
@@ -80,6 +83,12 @@ Future<AppHarness> pumpApp(
         ),
         activityRepositoryProvider.overrideWith(
           (ref) => FakeActivityRepository(
+            personaId: ref.watch(currentPersonaProvider),
+            delayScale: 0,
+          ),
+        ),
+        payoutRepositoryProvider.overrideWith(
+          (ref) => FakePayoutRepository(
             personaId: ref.watch(currentPersonaProvider),
             delayScale: 0,
           ),
