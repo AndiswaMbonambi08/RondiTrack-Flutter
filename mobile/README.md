@@ -15,6 +15,17 @@ Contract copy: `contract/schema.d.ts` is the openapi-typescript output of the AP
 
 Backend gaps found: `role` and cycle `status` are published as plain `string` in the OpenAPI document, not as enums, so the contract does not list their spellings (only a description does). Recorded as a gap, not fixed this week: the app maps any unexpected string to `unknown`.
 
+### Payouts (10.3)
+
+Read from API commit `0643e4b5f1`. API `main` had no endpoint for a cycle's payout order, so the gap is fixed in the API repo, with tests: hat does a non-member get? | 404 problem+json "Payout order not found.", identical to an unknown stokvel, an unknown cycle, a cycle of another stokvel and a malformed id. The fake throws `NotFoundException`. |
+
+| # | Question | Answer |
+|---|---|---|
+| 1 | Which endpoint returns a cycle's payout order, and what does each entry hold? | `GET /api/v1/stokvels/{stokvelId}/cycles/{cycleId}/payout-order` returns `{ stokvelId, cycleId, items[] }`. Each item holds `memberId`, `memberName`, `position` (1-based), `amountCents` (the pot), `payoutDate` (`yyyy-MM-dd` in Johannesburg, or `null` until paid) and `status`. `PayoutEntry` copies this with `Cents`, a `DateTime?` and `PayoutStatus`. |
+| 2 | How does the API spell each payout status? | Exactly `Paid`, `Next`, `Waiting` (case matters). Anything else becomes `PayoutStatus.unknown`. |
+| 3 | Does the API say who is next? | Yes: the item with status `Next` (none when everyone is paid). The server also decides the order and the positions. The app never sorts, counts or adds up. |
+| 4 | W| 5 | Which role may record a payout, and what does anyone else get? | Treasurer (Admin satisfies it) of that stokvel. `POST /api/v1/stokvels/{id}/cycles/{cycleId}/payout`: non-member 404, member 403, treasurer 201. The button shows only for Treasurer or Admin in that stokvel's membership, and only while the API says someone is Next. |
+
 ## Running it
 
 - API repo: `AndiswaMbonambi08/RondiTrack`. Nothing calls it yet: the app runs on fake repositories with the seed personas, so no API needs to be started this week. In Week 11 the dev flavour points at it (start it with `docker compose up` or `dotnet run` as its README says).
