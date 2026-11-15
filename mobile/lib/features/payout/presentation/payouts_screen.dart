@@ -6,6 +6,7 @@ import 'package:ronditrack/core/theme/status_colors.dart';
 import 'package:ronditrack/core/view_state.dart';
 import 'package:ronditrack/core/widgets.dart';
 import 'package:ronditrack/features/payout/application/payout_providers.dart';
+import 'package:ronditrack/features/payout/domain/payout_actions.dart';
 import 'package:ronditrack/features/payout/domain/payout_order.dart';
 import 'package:ronditrack/features/payout/domain/payout_status.dart';
 import 'package:ronditrack/features/payout/presentation/payout_chips.dart';
@@ -89,8 +90,7 @@ class _PayoutList extends StatelessWidget {
     final next = order.entries
         .where((e) => e.status == PayoutStatus.next)
         .firstOrNull;
-    final isTreasurer =
-        role == StokvelRole.treasurer || role == StokvelRole.admin;
+    final canRecord = canRecordPayout(role: role, order: order);
     return Align(
       alignment: Alignment.topCenter,
       child: ConstrainedBox(
@@ -101,7 +101,7 @@ class _PayoutList extends StatelessWidget {
           children: [
             if (refreshing) const LinearProgressIndicator(),
             if (next != null) _NextBanner(entry: next),
-            if (next != null && isTreasurer)
+            if (canRecord)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Align(
