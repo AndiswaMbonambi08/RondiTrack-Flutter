@@ -64,6 +64,11 @@ const tokenSpecs = <TokenSpec>[
     light: Tone(foreground: 0xFF7A1212, background: 0xFFFFE1E0),
     dark: Tone(foreground: 0xFFFFB4AE, background: 0xFF4A1010),
   ),
+  TokenSpec(
+    name: 'next',
+    light: Tone(foreground: 0xFF7A3E00, background: 0xFFFFE8D1),
+    dark: Tone(foreground: 0xFFFFC999, background: 0xFF45240A),
+  ),
 ];
 
 TokenSpec tokenSpec(String name) =>
