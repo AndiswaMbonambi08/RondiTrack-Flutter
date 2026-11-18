@@ -7,6 +7,7 @@ import 'package:ronditrack/features/activity/presentation/activity_screen.dart';
 import 'package:ronditrack/features/auth/presentation/sign_in_screen.dart';
 import 'package:ronditrack/features/home/presentation/home_screen.dart';
 import 'package:ronditrack/features/join/presentation/join_screen.dart';
+import 'package:ronditrack/features/payout/presentation/payouts_screen.dart';
 import 'package:ronditrack/features/profile/presentation/profile_screen.dart';
 import 'package:ronditrack/features/stokvel/presentation/cycle_screen.dart';
 import 'package:ronditrack/features/stokvel/presentation/stokvel_route_body.dart';
@@ -69,7 +70,12 @@ class JoinRoute extends GoRouteData with $JoinRoute {
             TypedGoRoute<StokvelRoute>(
               path: ':id',
               routes: <TypedRoute<RouteData>>[
-                TypedGoRoute<CycleRoute>(path: 'cycles/:cycleId'),
+                TypedGoRoute<CycleRoute>(
+                  path: 'cycles/:cycleId',
+                  routes: <TypedRoute<RouteData>>[
+                    TypedGoRoute<PayoutsRoute>(path: 'payouts'),
+                  ],
+                ),
               ],
             ),
           ],
@@ -156,6 +162,22 @@ class CycleRoute extends GoRouteData with $CycleRoute {
       MaterialPage<void>(
         key: const ValueKey('cycle-detail'),
         child: CycleScreen(stokvelId: id, cycleId: cycleId),
+      );
+}
+
+/// Under its cycle: back goes to the cycle, and a cold-start link builds the
+/// stokvel and the cycle underneath it.
+class PayoutsRoute extends GoRouteData with $PayoutsRoute {
+  const new({required this.id, required this.cycleId});
+
+  final String id;
+  final String cycleId;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) =>
+      MaterialPage<void>(
+        key: const ValueKey('payouts'),
+        child: PayoutsScreen(stokvelId: id, cycleId: cycleId),
       );
 }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ronditrack/app/routes.dart';
 import 'package:ronditrack/core/format_date.dart';
 import 'package:ronditrack/core/view_state.dart';
 import 'package:ronditrack/core/widgets.dart';
@@ -33,8 +34,9 @@ class CycleScreen extends ConsumerWidget {
           cycleId: cycleId,
           onRetry: retry,
         ),
-        ViewFailure(:final message) => FailureView(
+        ViewFailure(:final message, :final failure) => FailureView(
           message: message,
+          failure: failure,
           onRetry: retry,
         ),
       },
@@ -77,6 +79,17 @@ class _CycleBody extends StatelessWidget {
           ],
         ),
         Text('Due ${formatDate(cycle.dueDate)}'),
+        const SizedBox(height: 8),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: OutlinedButton(
+            onPressed: () => PayoutsRoute(
+              id: detail.stokvel.id,
+              cycleId: cycle.id,
+            ).go(context),
+            child: const Text('Rotation and payouts'),
+          ),
+        ),
         const Divider(height: 32),
         for (final c in detail.contributions) ContributionTile(contribution: c),
       ],

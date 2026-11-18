@@ -18,8 +18,10 @@ class StatusStyle {
       );
 }
 
-/// Colours Material does not have: one per contribution status, cycle status
-/// and arrears. Widgets ask for "arrears", never for a red.
+/// Colours Material does not have: one per contribution status, cycle status,
+/// arrears and the next payout. Widgets ask for "arrears", never for a red.
+/// Payout statuses reuse a measured pair where the meaning matches: Paid is
+/// `paidOut`, Waiting is `pending`, unknown is `unknown`. Only `next` is new.
 class StatusColors extends ThemeExtension<StatusColors> {
   const new({
     required this.pending,
@@ -30,6 +32,7 @@ class StatusColors extends ThemeExtension<StatusColors> {
     required this.paidOut,
     required this.unknown,
     required this.arrears,
+    required this.next,
   });
 
   // Reason: it picks the light or dark palette from the tokens, so a
@@ -55,6 +58,7 @@ class StatusColors extends ThemeExtension<StatusColors> {
       paidOut: style('paidOut'),
       unknown: style('unknown'),
       arrears: style('arrears'),
+      next: style('next'),
     );
   }
 
@@ -66,6 +70,7 @@ class StatusColors extends ThemeExtension<StatusColors> {
   final StatusStyle paidOut;
   final StatusStyle unknown;
   final StatusStyle arrears;
+  final StatusStyle next;
 
   @override
   StatusColors copyWith({
@@ -77,6 +82,7 @@ class StatusColors extends ThemeExtension<StatusColors> {
     StatusStyle? paidOut,
     StatusStyle? unknown,
     StatusStyle? arrears,
+    StatusStyle? next,
   }) => StatusColors(
     pending: pending ?? this.pending,
     paid: paid ?? this.paid,
@@ -86,6 +92,7 @@ class StatusColors extends ThemeExtension<StatusColors> {
     paidOut: paidOut ?? this.paidOut,
     unknown: unknown ?? this.unknown,
     arrears: arrears ?? this.arrears,
+    next: next ?? this.next,
   );
 
   @override
@@ -100,6 +107,7 @@ class StatusColors extends ThemeExtension<StatusColors> {
       paidOut: StatusStyle.lerp(paidOut, other.paidOut, t),
       unknown: StatusStyle.lerp(unknown, other.unknown, t),
       arrears: StatusStyle.lerp(arrears, other.arrears, t),
+      next: StatusStyle.lerp(next, other.next, t),
     );
   }
 }

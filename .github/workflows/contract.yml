@@ -1,0 +1,30 @@
+name: contract
+
+on:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      api_ref:
+        description: API branch to compare against
+        required: false
+        default: main
+
+jobs:
+  contract-matches-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: AndiswaMbonambi08/RondiTrack
+          ref: ${{ inputs.api_ref || 'main' }}
+          path: api
+          # A private repo needs: token: ${{ secrets.API_READ_TOKEN }}
+      - name: Compare the two openapi/v1.json files
+        run: |
+          tr -d '\r' < contract/openapi/v1.json > /tmp/app.json
+          tr -d '\r' < api/openapi/v1.json > /tmp/api.json
+          diff -u /tmp/api.json /tmp/app.json
+      - name: The copy has no stray files beside it
+        run: |
+          test "$(ls contract/openapi | wc -l)" -eq 1

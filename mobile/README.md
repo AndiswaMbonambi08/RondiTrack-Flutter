@@ -13,7 +13,18 @@ Contract copy: `contract/schema.d.ts` is the openapi-typescript output of the AP
 4. **Due dates.** `currentCycle.dueDate` is date-only (`2026-10-31`, nullable), modelled as a UTC-midnight `DateTime`. `nextPayoutUtc` is an instant (the last moment of the month in Johannesburg, `21:59:59Z`). Both are shown as a date in South African time (UTC+2, no daylight saving).
 5. **Seed personas.** Sipho: Member of Ubuntu Savings Circle and Treasurer of Umoja Family Fund (one login, two roles). Nomsa: Admin of Umoja Family Fund. The platform admin (`admin@example.com`) stays out of stokvel membership, so it is the empty-Home persona. The fakes hold the same people and stokvels; contributors and amounts inside them are made-up fake data.
 
-Backend gaps found: `role` and cycle `status` were published as plain `string` in the OpenAPI document, so the contract did not list their spellings. Fixed in the API repo with a contract test: https://github.com/AndiswaMbonambi08/RondiTrack/pull/20. The app still maps any unexpected string to `unknown`.
+Backend gaps found: `role` and cycle `status` are published as plain `string` in the OpenAPI document, not as enums, so the contract does not list their spellings (only a description does). Recorded as a gap, not fixed this week: the app maps any unexpected string to `unknown`.
+
+### Payouts (10.3)
+
+Read from API commit `0643e4b5f1`. API `main` had no endpoint for a cycle's payout order, so the gap is fixed in the API repo, with tests: hat does a non-member get? | 404 problem+json "Payout order not found.", identical to an unknown stokvel, an unknown cycle, a cycle of another stokvel and a malformed id. The fake throws `NotFoundException`. |
+
+| # | Question | Answer |
+|---|---|---|
+| 1 | Which endpoint returns a cycle's payout order, and what does each entry hold? | `GET /api/v1/stokvels/{stokvelId}/cycles/{cycleId}/payout-order` returns `{ stokvelId, cycleId, items[] }`. Each item holds `memberId`, `memberName`, `position` (1-based), `amountCents` (the pot), `payoutDate` (`yyyy-MM-dd` in Johannesburg, or `null` until paid) and `status`. `PayoutEntry` copies this with `Cents`, a `DateTime?` and `PayoutStatus`. |
+| 2 | How does the API spell each payout status? | Exactly `Paid`, `Next`, `Waiting` (case matters). Anything else becomes `PayoutStatus.unknown`. |
+| 3 | Does the API say who is next? | Yes: the item with status `Next` (none when everyone is paid). The server also decides the order and the positions. The app never sorts, counts or adds up. |
+| 4 | W| 5 | Which role may record a payout, and what does anyone else get? | Treasurer (Admin satisfies it) of that stokvel. `POST /api/v1/stokvels/{id}/cycles/{cycleId}/payout`: non-member 404, member 403, treasurer 201. The button shows only for Treasurer or Admin in that stokvel's membership, and only while the API says someone is Next. |
 
 ## Running it
 
@@ -87,6 +98,7 @@ Every screen has an address. A signed-out visit to any address goes to sign-in a
 | `/stokvels` | Stokvel list, Stokvels tab | Sign-in, then `/stokvels` | Only your own stokvels are listed | Leaves the app |
 | `/stokvels/:id` | Stokvel detail, Stokvels tab. At 840 dp or wider it is the list and the detail side by side | Sign-in, then this address | "Stokvel not found", the same screen as for a stokvel that does not exist | `/stokvels` (the detail sits on the list, also from a cold start) |
 | `/stokvels/:id/cycles/:cycleId` | Cycle, Stokvels tab | Sign-in, then this address | "Stokvel not found". A cycle id from a different stokvel: "Cycle not found" | `/stokvels/:id`, then `/stokvels` |
+| `/stokvels/:id/cycles/:cycleId/payouts` | Cycle, Stokvels tab | Sign-in, then this address | "Stokvel not found". A cycle id from a different stokvel: "Cycle not found" | `/stokvels/:id`, then `/stokvels` |
 | `/activity` | Activity tab | Sign-in, then `/activity` | Only your own stokvels' contributions are listed | Leaves the app |
 | `/profile` | Profile tab, with sign out | Sign-in, then `/profile` | Not applicable | Leaves the app |
 | `/join/:code` | Invitation preview, on top of Home | Sign-in, then this address | Unknown code: "Invitation not found" | `/` (Home) |
@@ -195,3 +207,81 @@ Breakpoints are written once in `lib/core/layout/breakpoints.dart` and come from
 The selected stokvel is in the address, so turning a tablet upright (under 840 dp) keeps that stokvel full screen, and back returns to the list. Side by side, back also returns to the list, with "Select a stokvel" on the right.
 
 Layout tests (`test/layout/layout_test.dart`) fail on overflow: Home, the stokvel list and stokvel detail at 360 by 640 dp with text at 200%, every action still reachable, and the list and detail side by side at 1280 by 800.
+
+## Personas
+
+Names follow the API's demo seed. Sipho plays the brief's "Lerato" (Treasurer of one stokvel, Member of another). Mpho plays the brief's "Sipho" (Member only). Platform admin is in no stokvels. Nomsa is Admin of Umoja, and Broken (dev) fails on purpose.
+
+| Person | Home | Ubuntu Savings Circle | Umoja Family Fund | Payouts view |
+Read from the API repo `AndiswaMbonambi08/RondiTrack` at commit `67a82a01f540f97ed481d0d01d1d6c201e0b7e6c`: its README and the generated types in `web/src/api/schema.d.ts`.
+Contract copy: `contract/schema.d.ts` is the openapi-typescript output of the API's live OpenAPI document (`web/src/api/schema.d.ts`) at that commit. The committed `clients/typescript/openapi.json` export at that commit predates `arrearsCents`, so it is not the current contract; refreshing it is a backend follow-up.
+
+1. **Spellings (case matters).** Contribution status is a real enum: `Pending`, `Paid`, `Confirmed`. Cycle status is a plain string, documented as `Open`, `Closed` (set by the cycle-close job) or `PaidOut`. Role is a plain string: `Member`, `Treasurer`, `Admin`. Any other string becomes `unknown`.
+2. **Role.** `GET /api/v1/me/home` returns it per stokvel as `stokvels[].role`. It is never on the user or in the token (the token carries only `sub`, `jti` and, for platform admins, a `PlatformAdmin` role claim). The stokvel detail fake returns it on the stokvel the same way. Admin satisfies every Treasurer check.
+3. **/me/home.** Per stokvel: `stokvelId`, `name`, `role`, `currentCycle` (`{id, label, status, dueDate}` or `null`), `paidCents`, `owedCents`, `arrearsCents` (int64 cents, never null) and `nextPayoutUtc` (date-time or `null`). The app shows them and never computes them. A user in no stokvels gets `200` with an empty list.
+4. **Due dates.** `currentCycle.dueDate` is date-only (`2026-10-31`, nullable), modelled as a UTC-midnight `DateTime`. `nextPayoutUtc` is an instant (the last moment of the month in Johannesburg, `21:59:59Z`). Both are shown as a date in South African time (UTC+2, no daylight saving).
+5. **Seed personas.** Sipho: Member of Ubuntu Savings Circle and Treasurer of Umoja Family Fund (one login, two roles). Nomsa: Admin of Umoja Family Fund. The platform admin (`admin@example.com`) stays out of stokvel membership, so it is the empty-Home persona. The fakes hold the same people and stokvels; contributors and amounts inside them are made-up fake data.
+
+Backend gaps found: `role` and cycle `status` were published as plain `string` in the OpenAPI document, so the contract did not list their spellings. Fixed in the API repo with a contract test: https://github.com/AndiswaMbonambi08/RondiTrack/pull/20. The app still maps any unexpected string to `unknown`.
+
+## Architecture rules
+
+`test/architecture/architecture_test.dart` fails CI when:
+
+- a file under `lib/features` types a colour (`Colors.`, `Color(`, `Color.from...`): ask the theme;
+- a screen (a file in a `presentation/` folder, or under `lib/app`) imports a `data/` folder, Dio or Drift: go through a provider.
+
+Every exception is a record in the test with the file, the reason and the week it ends; an exception with no reason, a missing file or a passed end week fails the test.
+
+| File | Rule | Reason | Ends |
+|---|---|---|---|
+| none | | There are no exceptions today. | |
+
+## Contract notes (11.1)
+
+API commit read from: `6583344` (API repo, branch `feat/commit-openapi-v1`, file `openapi/v1.json`).
+
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | How a page ends | The schema declares `nextPageToken` as a string. Whether the last page sends null, "" or omits it is NOT yet confirmed against a running API. Only the first page is read today. |
+| 2 | Stale write guard | Not declared in the spec (no `If-Match`, `ETag` or version on payouts). The close preview carries a `version` string and a stale close is a 409 with code `stale-preview` (API Assignment 9.1). |
+| 3 | Status spellings | Cycle: `Open`, `Closed`, `PaidOut`. Contribution: `Pending`, `Paid`, `Confirmed`. Role: `Member`, `Treasurer`, `Admin`. Activity kind: `Contribution`, `Payout`, `MemberJoined`. Unknown strings become `unknown`. |
+| 4 | Refresh cookie, token life | Not yet confirmed. The login response returns `accessToken` and `expiresInSeconds`. |
+| 5 | correlationId on every error | Yes. `ProblemDetails` declares `correlationId`. |
+| 6 | Non-member and wrong role | Not found for a stokvel the caller is not in. A Member on a treasurer action gets 403. Seed: Sipho is a Member in Ubuntu and the Treasurer in Umoja. Not yet re-confirmed on a running API. |
+| 7 | Rate limits | `Retry-After` is not declared in the spec. The app reads the raw header. Not yet confirmed which endpoints are limited. |
+
+Backend gap found: role and cycle status were plain strings in the OpenAPI document. Fixed in the API repo: https://github.com/AndiswaMbonambi08/RondiTrack/pull/20.
+
+## Running against the API
+
+1. Start Postgres and the API with `ASPNETCORE_URLS=http://0.0.0.0:5051`. The API migrates and seeds itself on startup.
+2. Run the dev flavour with the seed password passed in, never committed:
+   `flutter run --flavor dev --dart-define-from-file=config/dev.json --dart-define=SEED_PASSWORD=<password>`
+3. The emulator reaches the laptop at `10.0.2.2`. Only Sipho, Nomsa and the admin have API accounts. Mpho and Broken exist only as fakes.
+4. `config/dev.json` sets `USE_API` to true. Without it the app runs on the fakes, which is what the Week 10 tests use.
+
+## The API client
+
+The response types are hand-written (`data/*_dto.dart`) and stop in `data/`. Reason: the generator needs a toolchain and a drift step for only four endpoints, and the hand-written types are small and tested. swagger_parser stays pinned in `pubspec.yaml` for when the app grows. Drift check: CI compares `contract/openapi/v1.json` with the API repo's file, and can be pointed at an API branch. Because there is no generated client, there is no regenerate step.
+
+## Failures
+
+| API answer | Failure | The person sees |
+|------------|---------|-----------------|
+| 400 | ValidationFailure | The detail, or "Please check what you entered and try again." |
+| 401 | UnauthorizedFailure | "Please sign in again." |
+| 403 | ForbiddenFailure | The API's message. They stay signed in. |
+| 404 | NotFoundFailure | Not found, never "no access" |
+| 409, 412 | ConflictFailure | "This changed elsewhere. Refresh and try again." when stale |
+| 422 | RuleFailure | The detail |
+| 429 | RateLimitedFailure | "Try again in N seconds" from `Retry-After` |
+| 5xx, unreadable body | ServerFailure | An apology and the copyable reference |
+| No answer | NoAnswerFailure | "You're offline, or we couldn't reach the server" with Try again |
+
+## Decisions
+
+- Result: a sealed class (`Ok` and `Err`) with a `guard` helper. The API repositories currently throw the typed Failure and providers hold it in an AsyncError, which the screens read through `ViewFailure`.
+- Models: hand-written, see The API client.
+- Timeouts: connect 10 s, send 15 s, receive 30 s. These are NOT yet measured against the API with its database down. Measure before relying on them.
+- Retry: only reads, and only for "no answer", three attempts. Every 4xx is final and writes are never retried. A 500 is not retried. Not yet measured.
