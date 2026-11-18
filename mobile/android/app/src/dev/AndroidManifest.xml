@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Dev flavour only: plain HTTP to the emulator's alias for this laptop.
+         Staging and prod never get this. -->
+    <application android:networkSecurityConfig="@xml/network_security_config" />
+</manifest>
