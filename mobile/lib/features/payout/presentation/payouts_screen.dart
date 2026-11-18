@@ -44,8 +44,9 @@ class PayoutsScreen extends ConsumerWidget {
           role: role,
           refreshing: refreshing,
         ),
-        ViewFailure(:final message) => FailureView(
+        ViewFailure(:final message, :final failure) => FailureView(
           message: message,
+          failure: failure,
           onRetry: () => ref.invalidate(provider),
         ),
       },

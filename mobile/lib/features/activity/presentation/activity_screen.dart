@@ -37,8 +37,9 @@ class ActivityScreen extends ConsumerWidget {
               ),
           ],
         ),
-        ViewFailure(:final message) => FailureView(
+        ViewFailure(:final message, :final failure) => FailureView(
           message: message,
+          failure: failure,
           onRetry: () => ref.invalidate(activityFeedProvider),
         ),
       },

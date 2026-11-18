@@ -32,8 +32,9 @@ class StokvelDetailScreen extends ConsumerWidget {
       ViewLoading() => const LoadingView(),
       ViewEmpty() => const Center(child: Text('No contributions yet.')),
       ViewData(:final data) => StokvelDetailBody(detail: data),
-      ViewFailure(:final message) => FailureView(
+      ViewFailure(:final message, :final failure) => FailureView(
         message: message,
+        failure: failure,
         onRetry: () => ref.invalidate(stokvelDetailProvider(stokvelId)),
       ),
     };
