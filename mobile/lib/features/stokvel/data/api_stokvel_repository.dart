@@ -9,9 +9,7 @@ import 'package:ronditrack/features/stokvel/domain/stokvel_repository.dart';
 
 // The API sends a label, the domain wants a number: take the last number in it.
 int _cycleNumber(String label) =>
-    int.tryParse(
-      RegExp(r'\d+').allMatches(label).lastOrNull?.group(0) ?? '',
-    ) ??
+    int.tryParse(RegExp(r'\d+').allMatches(label).lastOrNull?.group(0) ?? '') ??
     0;
 
 Cycle toCycle(CycleDto d) => Cycle(
