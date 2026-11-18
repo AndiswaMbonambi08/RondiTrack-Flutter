@@ -1,3 +1,5 @@
+import 'package:ronditrack/core/errors.dart';
+
 /// Every way a call to the API can go wrong, with the words the person sees.
 /// Each case decides its own words, once. Presentation never sees Dio.
 sealed class Failure implements Exception {
@@ -43,7 +45,7 @@ final class ForbiddenFailure extends Failure {
 
 /// A stokvel or cycle the person is not in looks exactly like one that does not
 /// exist, so this never carries the API's wording.
-final class NotFoundFailure extends Failure {
+final class NotFoundFailure extends Failure implements NotFoundException {
   const new({super.correlationId});
 
   @override
