@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'failure.dart';
-import 'failure_mapper.dart';
+import 'package:ronditrack/core/failure/failure.dart';
+import 'package:ronditrack/core/failure/failure_mapper.dart';
 
 /// Retry is a rule over Failure types, not status codes. Only "no answer" is
 /// retried. Every 4xx is final, and a 5xx is not retried because the API

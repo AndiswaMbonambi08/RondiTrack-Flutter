@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import 'safe_log_interceptor.dart';
+import 'package:ronditrack/core/network/safe_log_interceptor.dart';
 
 // Timeouts are decisions, and the README says why each number (see
 // "Decisions"). Receive is the longest on purpose: when the API's database is
@@ -14,7 +14,7 @@ const receiveTimeout = Duration(seconds: 30);
 /// signing out is the session's decision, not the transport's, so a 403 does
 /// not sign anyone out.
 class BearerInterceptor extends Interceptor {
-  BearerInterceptor(this._readToken);
+  new(this._readToken);
 
   final String? Function() _readToken;
 

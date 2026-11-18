@@ -6,8 +6,7 @@ typedef LogSink = void Function(String line);
 /// correlationId. Never a header, a cookie, a body or a query value: under
 /// POPIA a member's name, amounts and arrears are personal information.
 class SafeLogInterceptor extends Interceptor {
-  SafeLogInterceptor(this._sink, {DateTime Function() now = DateTime.now})
-    : _now = now;
+  new(this._sink, {this._now = DateTime.now});
 
   final LogSink _sink;
   final DateTime Function() _now;

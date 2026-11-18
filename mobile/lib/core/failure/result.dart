@@ -1,9 +1,9 @@
-import 'failure.dart';
+import 'package:ronditrack/core/failure/failure.dart';
 
 /// What a repository returns: a value, or the [Failure] that stopped it.
 /// A sealed class, so a `switch` must handle both cases.
 sealed class Result<T> {
-  const Result();
+  const new();
 
   /// For providers: returns the value, or throws the [Failure] so Riverpod
   /// holds an AsyncError whose error is that Failure.
@@ -14,13 +14,13 @@ sealed class Result<T> {
 }
 
 final class Ok<T> extends Result<T> {
-  const Ok(this.value);
+  const new(this.value);
 
   final T value;
 }
 
 final class Err<T> extends Result<T> {
-  const Err(this.failure);
+  const new(this.failure);
 
   final Failure failure;
 }

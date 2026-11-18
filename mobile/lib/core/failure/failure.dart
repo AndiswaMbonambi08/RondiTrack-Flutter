@@ -1,7 +1,7 @@
 /// Every way a call to the API can go wrong, with the words the person sees.
 /// Each case decides its own words, once. Presentation never sees Dio.
 sealed class Failure implements Exception {
-  const Failure({this.correlationId});
+  const new({this.correlationId});
 
   /// The API's reference for this request, when the API answered with one.
   final String? correlationId;
@@ -14,11 +14,7 @@ String _orElse(String? value, String fallback) =>
     (value == null || value.trim().isEmpty) ? fallback : value;
 
 final class ValidationFailure extends Failure {
-  const ValidationFailure({
-    this.detail,
-    this.fieldErrors = const {},
-    super.correlationId,
-  });
+  const new({this.detail, this.fieldErrors = const {}, super.correlationId});
 
   final String? detail;
   final Map<String, List<String>> fieldErrors;
@@ -29,14 +25,14 @@ final class ValidationFailure extends Failure {
 }
 
 final class UnauthorizedFailure extends Failure {
-  const UnauthorizedFailure({super.correlationId});
+  const new({super.correlationId});
 
   @override
   String get message => 'Please sign in again.';
 }
 
 final class ForbiddenFailure extends Failure {
-  const ForbiddenFailure({this.detail, super.correlationId});
+  const new({this.detail, super.correlationId});
 
   final String? detail;
 
@@ -48,14 +44,14 @@ final class ForbiddenFailure extends Failure {
 /// A stokvel or cycle the person is not in looks exactly like one that does not
 /// exist, so this never carries the API's wording.
 final class NotFoundFailure extends Failure {
-  const NotFoundFailure({super.correlationId});
+  const new({super.correlationId});
 
   @override
   String get message => 'Not found';
 }
 
 final class ConflictFailure extends Failure {
-  const ConflictFailure({
+  const new({
     this.detail,
     this.code,
     this.isStale = false,
@@ -81,7 +77,7 @@ final class ConflictFailure extends Failure {
 }
 
 final class RuleFailure extends Failure {
-  const RuleFailure({this.detail, super.correlationId});
+  const new({this.detail, super.correlationId});
 
   final String? detail;
 
@@ -90,7 +86,7 @@ final class RuleFailure extends Failure {
 }
 
 final class RateLimitedFailure extends Failure {
-  const RateLimitedFailure({this.retryAfterSeconds, super.correlationId});
+  const new({this.retryAfterSeconds, super.correlationId});
 
   /// From the API's Retry-After header, in seconds.
   final int? retryAfterSeconds;
@@ -109,7 +105,7 @@ final class RateLimitedFailure extends Failure {
 /// A 5xx, a page from a proxy, or a body our models cannot read. The API's
 /// own message is never shown, only an apology and the reference.
 final class ServerFailure extends Failure {
-  const ServerFailure({super.correlationId});
+  const new({super.correlationId});
 
   @override
   String get message => 'Sorry, something went wrong on our side.';
@@ -117,7 +113,7 @@ final class ServerFailure extends Failure {
 
 /// No answer at all: offline, timed out, or the server was unreachable.
 final class NoAnswerFailure extends Failure {
-  const NoAnswerFailure();
+  const new();
 
   @override
   String get message => "You're offline, or we couldn't reach the server.";

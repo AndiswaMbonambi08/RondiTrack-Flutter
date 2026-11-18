@@ -4,8 +4,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
-import 'failure.dart';
-import 'result.dart';
+import 'package:ronditrack/core/failure/failure.dart';
+import 'package:ronditrack/core/failure/result.dart';
 
 /// The one place anything thrown becomes a [Failure].
 Failure toFailure(Object error) {

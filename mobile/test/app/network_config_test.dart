@@ -41,7 +41,7 @@ void main() {
     final xml = _read(
       'android/app/src/dev/res/xml/network_security_config.xml',
     );
-    final hosts = RegExp(r'<domain[^>]*>([^<]+)</domain>')
+    final hosts = RegExp('<domain[^>]*>([^<]+)</domain>')
         .allMatches(xml)
         .map((m) => m.group(1)!.trim())
         .toList();

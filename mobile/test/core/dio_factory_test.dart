@@ -7,7 +7,7 @@ import 'package:ronditrack/core/network/dio_factory.dart';
 import 'package:ronditrack/core/session/access_token.dart';
 
 class _Recorder implements HttpClientAdapter {
-  _Recorder(this.status);
+  new(this.status);
 
   final int status;
   RequestOptions? last;

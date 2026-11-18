@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ronditrack/core/network/safe_log_interceptor.dart';
 
 class _Adapter implements HttpClientAdapter {
-  _Adapter(this.status, this.body);
+  new(this.status, this.body);
 
   final int status;
   final String body;
