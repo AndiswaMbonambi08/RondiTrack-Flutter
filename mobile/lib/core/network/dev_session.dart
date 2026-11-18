@@ -12,7 +12,7 @@ part 'dev_session.g.dart';
 /// call. The password comes from --dart-define=SEED_PASSWORD and is never
 /// committed. The token goes to memory only.
 class DevSession {
-  DevSession(this._dio, this._setToken, this._email, this._password);
+  new(this._dio, this._setToken, this._email, this._password);
 
   final Dio _dio;
   final void Function(String?) _setToken;
