@@ -42,9 +42,9 @@ class DevSession {
   static String? _subject(String jwt) {
     final parts = jwt.split('.');
     if (parts.length != 3) return null;
-    final payload =
-        jsonDecode(utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))))
-            as Map<String, dynamic>;
+    final payload = jsonDecode(
+      utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+    ) as Map<String, dynamic>;
     final id =
         payload['sub'] ??
         payload['nameid'] ??
