@@ -41,7 +41,8 @@ final class ForbiddenFailure extends Failure {
   final String? detail;
 
   @override
-  String get message => _orElse(detail, "You don't have permission to do that.");
+  String get message =>
+      _orElse(detail, "You don't have permission to do that.");
 }
 
 /// A stokvel or cycle the person is not in looks exactly like one that does not

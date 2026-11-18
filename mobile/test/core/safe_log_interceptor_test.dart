@@ -83,10 +83,7 @@ void main() {
   });
 
   test('a correlationId that is not a plain id is not logged', () async {
-    final log = await _call(
-      500,
-      '{"correlationId":"Thandi Nkosi owes R5000"}',
-    );
+    final log = await _call(500, '{"correlationId":"Thandi Nkosi owes R5000"}');
     expect(log, isNot(contains('correlationId=')));
     expectNoPersonalData(log);
   });
