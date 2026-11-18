@@ -6,6 +6,13 @@ import 'package:ronditrack/features/activity/application/activity_providers.dart
 import 'package:ronditrack/features/activity/domain/activity_item.dart';
 import 'package:ronditrack/features/stokvel/presentation/status_chips.dart';
 
+String _kindLabel(ActivityKind kind) => switch (kind) {
+  ActivityKind.contribution => 'Contribution',
+  ActivityKind.payout => 'Payout',
+  ActivityKind.memberJoined => 'Joined the stokvel',
+  ActivityKind.unknown => 'Activity',
+};
+
 class ActivityScreen extends ConsumerWidget {
   const new({super.key});
 
@@ -31,7 +38,10 @@ class ActivityScreen extends ConsumerWidget {
                   children: [
                     Text(item.stokvelName),
                     const SizedBox(height: 4),
-                    ContributionStatusChip(status: item.status),
+                    if (item.status case final status?)
+                      ContributionStatusChip(status: status)
+                    else
+                      Text(_kindLabel(item.kind)),
                   ],
                 ),
               ),
