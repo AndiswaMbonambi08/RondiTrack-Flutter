@@ -38,8 +38,7 @@ void main() {
     final completer = Completer<PayoutOrder>();
     final container = containerWith(
       StubPayoutRepository((_, _) => completer.future),
-    );
-    container.listen(provider, (_, _) {});
+    )..listen(provider, (_, _) {});
     expect(viewOf(container, provider), isA<ViewLoading<PayoutOrder>>());
 
     completer.complete(
@@ -63,8 +62,7 @@ void main() {
   test('empty is empty, not data', () async {
     final container = containerWith(
       StubPayoutRepository((s, c) async => orderOf(s, c)),
-    );
-    container.listen(provider, (_, _) {});
+    )..listen(provider, (_, _) {});
     await container.read(provider.future);
     expect(viewOf(container, provider), isA<ViewEmpty<PayoutOrder>>());
   });
@@ -72,8 +70,7 @@ void main() {
   test('a failure maps to failure', () async {
     final container = containerWith(
       StubPayoutRepository((_, _) async => throw Exception('boom')),
-    );
-    container.listen(provider, (_, _) {});
+    )..listen(provider, (_, _) {});
     await expectLater(container.read(provider.future), throwsException);
     expect(viewOf(container, provider), isA<ViewFailure<PayoutOrder>>());
   });
@@ -85,8 +82,7 @@ void main() {
         calls++;
         throw const NotFoundException();
       }),
-    );
-    container.listen(provider, (_, _) {});
+    )..listen(provider, (_, _) {});
     await expectLater(
       container.read(provider.future),
       throwsA(isA<NotFoundException>()),
