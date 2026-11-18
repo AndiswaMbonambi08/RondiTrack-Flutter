@@ -236,3 +236,52 @@ Every exception is a record in the test with the file, the reason and the week i
 | File | Rule | Reason | Ends |
 |---|---|---|---|
 | none | | There are no exceptions today. | |
+
+## Contract notes (11.1)
+
+API commit read from: `6583344` (API repo, branch `feat/commit-openapi-v1`, file `openapi/v1.json`).
+
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | How a page ends | The schema declares `nextPageToken` as a string. Whether the last page sends null, "" or omits it is NOT yet confirmed against a running API. Only the first page is read today. |
+| 2 | Stale write guard | Not declared in the spec (no `If-Match`, `ETag` or version on payouts). The close preview carries a `version` string and a stale close is a 409 with code `stale-preview` (API Assignment 9.1). |
+| 3 | Status spellings | Cycle: `Open`, `Closed`, `PaidOut`. Contribution: `Pending`, `Paid`, `Confirmed`. Role: `Member`, `Treasurer`, `Admin`. Activity kind: `Contribution`, `Payout`, `MemberJoined`. Unknown strings become `unknown`. |
+| 4 | Refresh cookie, token life | Not yet confirmed. The login response returns `accessToken` and `expiresInSeconds`. |
+| 5 | correlationId on every error | Yes. `ProblemDetails` declares `correlationId`. |
+| 6 | Non-member and wrong role | Not found for a stokvel the caller is not in. A Member on a treasurer action gets 403. Seed: Sipho is a Member in Ubuntu and the Treasurer in Umoja. Not yet re-confirmed on a running API. |
+| 7 | Rate limits | `Retry-After` is not declared in the spec. The app reads the raw header. Not yet confirmed which endpoints are limited. |
+
+Backend gap found: role and cycle status were plain strings in the OpenAPI document. Fixed in the API repo: https://github.com/AndiswaMbonambi08/RondiTrack/pull/20.
+
+## Running against the API
+
+1. Start Postgres and the API with `ASPNETCORE_URLS=http://0.0.0.0:5051`. The API migrates and seeds itself on startup.
+2. Run the dev flavour with the seed password passed in, never committed:
+   `flutter run --flavor dev --dart-define-from-file=config/dev.json --dart-define=SEED_PASSWORD=<password>`
+3. The emulator reaches the laptop at `10.0.2.2`. Only Sipho, Nomsa and the admin have API accounts. Mpho and Broken exist only as fakes.
+4. `config/dev.json` sets `USE_API` to true. Without it the app runs on the fakes, which is what the Week 10 tests use.
+
+## The API client
+
+The response types are hand-written (`data/*_dto.dart`) and stop in `data/`. Reason: the generator needs a toolchain and a drift step for only four endpoints, and the hand-written types are small and tested. swagger_parser stays pinned in `pubspec.yaml` for when the app grows. Drift check: CI compares `contract/openapi/v1.json` with the API repo's file, and can be pointed at an API branch. Because there is no generated client, there is no regenerate step.
+
+## Failures
+
+| API answer | Failure | The person sees |
+|------------|---------|-----------------|
+| 400 | ValidationFailure | The detail, or "Please check what you entered and try again." |
+| 401 | UnauthorizedFailure | "Please sign in again." |
+| 403 | ForbiddenFailure | The API's message. They stay signed in. |
+| 404 | NotFoundFailure | Not found, never "no access" |
+| 409, 412 | ConflictFailure | "This changed elsewhere. Refresh and try again." when stale |
+| 422 | RuleFailure | The detail |
+| 429 | RateLimitedFailure | "Try again in N seconds" from `Retry-After` |
+| 5xx, unreadable body | ServerFailure | An apology and the copyable reference |
+| No answer | NoAnswerFailure | "You're offline, or we couldn't reach the server" with Try again |
+
+## Decisions
+
+- Result: a sealed class (`Ok` and `Err`) with a `guard` helper. The API repositories currently throw the typed Failure and providers hold it in an AsyncError, which the screens read through `ViewFailure`.
+- Models: hand-written, see The API client.
+- Timeouts: connect 10 s, send 15 s, receive 30 s. These are NOT yet measured against the API with its database down. Measure before relying on them.
+- Retry: only reads, and only for "no answer", three attempts. Every 4xx is final and writes are never retried. A 500 is not retried. Not yet measured.
