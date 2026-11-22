@@ -321,3 +321,14 @@ No password is passed in. The dev flavour's persona menu fills in an email on th
 - Android backup is off (allowBackup false) because a restored token has no key to open it.
 - Refresh margin is 60 seconds on a 15 minute token.
 - dependency_overrides: objective_c 9.6.2, code_assets 2.1.0, jni 1.1.2, jni_flutter 1.0.4+1 and material_ui 1.10.0, because the newest versions were under two weeks old. Remove each once the newest version is two weeks old.
+
+### Offline, forms and lists
+
+API commit: 49d043f42570aaca83120ed6841585e4b3d03335
+
+1. **Idempotency.** Keys are required on `POST /api/v1/stokvels/{id}/contributions` and on the cycle close. The same key and body returns 201 with the first answer and `Idempotency-Replayed: true`; the same key with a different body returns 422. Keys are scoped to caller and stokvel. M is 168 hours (7 days), `Housekeeping:IdempotencyRetentionHours`. The outbox maximum age is 48 hours, shorter than M.
+2. **Refusals.** 409: cycle closed, cycle paid out, not a member, already contributed. 404: unknown stokvel, user or cycle. 403: a Member recording for someone else. 400: amount outside 1 to 100 000 000 cents. 422: key reused with another body. 429 with Retry-After: per-user token bucket, and a 429 never consumes the key. The 409s had no code; the backend PR adds one.
+3. **Edits.** Only payouts are versioned: ETag on GET, If-Match on PUT, 428 when missing, 412 when stale ("The resource was changed by someone else since you read it. Fetch it again and retry."). Stokvel and cycle edits are last write wins, so the stale-edit demo uses a payout.
+4. **Contributions list.** `GET /api/v1/stokvels/{id}/contribution-history`: pageSize default 25, largest 100; the end marker is an empty nextPageToken. Filters: member, from, to, sort, plus cycleId and status from the backend PR. from and to are UTC instants with a zone, from included and to excluded; a date without a time is 400. A token only works with the filters it came from.
+5. **Forms.** 400 errors are `errors: { field: [messages] }` in camelCase. Pay sends `amountInCents` (integer cents). Create stokvel sends `contributionAmount` as a rand JSON number today; the backend PR adds cents. Neither body has a date.
+6. **Personal data.** Proofs of payment are never downloaded or cached (the API sends them private, no-store). No ID numbers or bank details exist in the API. Names and amounts are cached in Drift only, Android backup is off, and sign-out empties the database.
