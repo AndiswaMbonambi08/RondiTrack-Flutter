@@ -13,6 +13,7 @@ part 'activity_providers.g.dart';
 /// The only place that names the implementation: fakes or the API.
 @Riverpod(keepAlive: true)
 ActivityRepository activityRepository(Ref ref) {
+  ref.watch(sessionScopeProvider);
   if (ref.watch(useFakesProvider)) {
     return FakeActivityRepository(personaId: ref.watch(currentPersonaProvider));
   }

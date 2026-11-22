@@ -16,6 +16,7 @@ PayoutRepository payoutRepository(Ref ref) =>
 /// are Strings, so a rebuild never makes a new family member.
 @riverpod
 Future<PayoutOrder> payoutOrder(Ref ref, String stokvelId, String cycleId) {
+  ref.watch(sessionScopeProvider);
   // Log ids only: never a name or an amount.
   ref.onDispose(
     () => debugPrint('payoutOrder disposed stokvel=$stokvelId cycle=$cycleId'),
