@@ -28,7 +28,7 @@ class SessionInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    if (session.needsRefresh) {
+    if (session.needsRefresh || session.accessToken == null) {
       final outcome = await session.refresh();
       if (outcome is Refused) {
         await onSessionEnded();

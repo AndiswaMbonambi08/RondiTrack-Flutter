@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ronditrack/core/database/database_provider.dart';
 import 'package:ronditrack/core/network/auth_api.dart';
 import 'package:ronditrack/core/network/network_providers.dart';
 import 'package:ronditrack/core/network/session_manager.dart';
@@ -19,7 +20,9 @@ class Auth extends Notifier<AuthState> {
     return const Restoring();
   }
 
-  /// On launch, one refresh. Also the splash's Try again.
+  /// On launch, one refresh. Also the splash's Try again. With no signal the
+  /// app opens as the person last signed in, on cached data, and the session
+  /// comes back with the first request that gets through.
   Future<void> restore() async {
     state = const Restoring();
     if (!await _manager.hasStoredToken()) {
@@ -29,20 +32,23 @@ class Auth extends Notifier<AuthState> {
     final outcome = await _manager.refresh();
     switch (outcome) {
       case Refreshed(:final accessToken):
-        state = SignedIn(
-          userId: subjectOf(accessToken),
-          sessionId: ++_sessions,
-        );
+        await _signedIn(subjectOf(accessToken));
       case Refused():
         await sessionEnded();
       case Unavailable():
-        state = const Restoring(offline: true);
+        final saved = await ref.read(appDatabaseProvider).savedUserId();
+        state = saved == null
+            ? const Restoring(offline: true)
+            : SignedIn(userId: saved, sessionId: ++_sessions);
       case Cancelled():
         break;
     }
   }
 
-  Future<void> signIn({required String email, required String password}) async {
+  Future<void> signIn({
+    required String email,
+    required String password,
+  }) async {
     final grant = await ref
         .read(authApiProvider)
         .login(email: email, password: password);
@@ -70,25 +76,32 @@ class Auth extends Notifier<AuthState> {
       expiresInSeconds: grant.expiresInSeconds,
       refreshToken: grant.refreshToken,
     );
-    state = SignedIn(
-      userId: subjectOf(grant.accessToken),
-      sessionId: ++_sessions,
-    );
+    await _signedIn(subjectOf(grant.accessToken));
   }
 
-  /// Wipes the phone first, then tells the API with a short timeout. Works
-  /// with no network and never waits for the API.
+  Future<void> _signedIn(String? userId) async {
+    if (userId != null) await ref.read(appDatabaseProvider).saveUserId(userId);
+    state = SignedIn(userId: userId, sessionId: ++_sessions);
+  }
+
+  /// Wipes the phone first (tokens, every cached row, the outbox, who was
+  /// signed in), then tells the API with a short timeout. Works with no
+  /// network and never waits for the API. The screen asks first when a
+  /// payment is still waiting in the outbox.
   Future<void> signOut() async {
     final refreshToken = await _manager.wipe();
     ref.read(pendingJoinProvider.notifier).clear();
+    await ref.read(appDatabaseProvider).wipe();
     state = const SignedOut();
     unawaited(_manager.notifyLogout(refreshToken));
   }
 
-  /// Only the refresh endpoint's own 401 gets here.
+  /// Only the refresh endpoint's own 401 gets here. Caches go, an unsent
+  /// payment stays for its owner.
   Future<void> sessionEnded() async {
     if (state is SignedOut) return;
     await _manager.wipe();
+    await ref.read(appDatabaseProvider).wipeCaches();
     state = const SignedOut();
   }
 }
@@ -100,6 +113,14 @@ final authProvider = NotifierProvider<Auth, AuthState>(Auth.new);
 final sessionScopeProvider = Provider<int?>(
   (ref) => switch (ref.watch(authProvider)) {
     SignedIn(:final sessionId) => sessionId,
+    _ => null,
+  },
+);
+
+/// Who is signed in, from the auth state. Still known while offline.
+final currentUserIdProvider = Provider<String?>(
+  (ref) => switch (ref.watch(authProvider)) {
+    SignedIn(:final userId) => userId,
     _ => null,
   },
 );
