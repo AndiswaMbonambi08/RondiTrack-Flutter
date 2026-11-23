@@ -44,9 +44,16 @@ flutter:
   uses-material-design: true
   generate: true
 
+# Each package is held at the newest version that was at least 14 days old on
+# 2026-11-23. Remove a line on its date, run pub get, then run
+# tool/check_lock_age.ps1. The date is the day after the newest version
+# turns 14 days old.
 dependency_overrides:
-  objective_c: 9.6.2
-  code_assets: 2.1.0
-  jni: 1.1.2
-  jni_flutter: 1.0.4+1
-  material_ui: 1.10.0
+  cli_util: 0.6.0 # remove on 2026-12-05 (0.6.1 is from 2026-11-20)
+  jni: 1.1.2 # remove on 2026-12-04 (1.2.1 is from 2026-11-19)
+  jni_flutter: 1.0.4+1 # remove on 2026-12-03 (1.1.0 is from 2026-11-18)
+  material_ui: 1.10.0 # remove on 2026-12-01 (1.11.1 is from 2026-11-16)
+  objective_c: 9.6.3 # remove on 2026-11-26 (9.6.4 is from 2026-11-11)
+  shared_preferences_android: 2.5.4 # remove on 2026-11-26 (2.5.5 is from 2026-11-11)
+  shared_preferences_foundation: 2.6.1 # remove on 2026-11-26 (2.6.2 is from 2026-11-11)
+  sqlite3: 3.9.1 # remove on 2026-12-07 (3.9.2 is from 2026-11-22)
