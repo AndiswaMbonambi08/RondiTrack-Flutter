@@ -34,8 +34,9 @@ class CycleScreen extends ConsumerWidget {
           cycleId: cycleId,
           onRetry: retry,
         ),
-        ViewFailure(:final message) => FailureView(
+        ViewFailure(:final message, :final failure) => FailureView(
           message: message,
+          failure: failure,
           onRetry: retry,
         ),
       },

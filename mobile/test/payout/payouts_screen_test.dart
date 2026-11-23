@@ -111,7 +111,7 @@ void main() {
         payouts: StubPayoutRepository((s, c) async {
           calls++;
           if (calls == 1) throw Exception('boom');
-          return FakePayoutRepository(
+          return await FakePayoutRepository(
             personaId: 'sipho',
             delayScale: 0,
           ).fetchOrder(stokvelId: s, cycleId: c);

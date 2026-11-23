@@ -49,8 +49,9 @@ class StokvelsScreen extends ConsumerWidget {
                   ],
                 )
               : _StokvelList(entries: data, selectedId: id),
-        ViewFailure(:final message) => FailureView(
+        ViewFailure(:final message, :final failure) => FailureView(
           message: message,
+          failure: failure,
           onRetry: () => ref.invalidate(homeControllerProvider),
         ),
       },
