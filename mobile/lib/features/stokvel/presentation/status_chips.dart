@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ronditrack/core/status_chip.dart';
 import 'package:ronditrack/core/theme/status_colors.dart';
 import 'package:ronditrack/features/stokvel/domain/enums.dart';
-import 'package:ronditrack/features/stokvel/presentation/labels.dart';
+import 'package:ronditrack/l10n/generated/app_localizations.dart';
+import 'package:ronditrack/l10n/labels.dart';
 
 /// No wildcard over a status: a new status is a compile error here.
 class ContributionStatusChip extends StatelessWidget {
@@ -12,6 +13,7 @@ class ContributionStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final colors = context.statusColors;
     final (style, icon) = switch (status) {
       ContributionStatus.pending => (colors.pending, Icons.schedule),
@@ -20,7 +22,7 @@ class ContributionStatusChip extends StatelessWidget {
       ContributionStatus.unknown => (colors.unknown, Icons.help_outline),
     };
     return StatusChip(
-      label: contributionLabel(status),
+      label: contributionStatusText(l, status),
       icon: icon,
       style: style,
     );
@@ -34,6 +36,7 @@ class CycleStatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final colors = context.statusColors;
     final (style, icon) = switch (status) {
       CycleStatus.open => (colors.open, Icons.lock_open),
@@ -41,6 +44,10 @@ class CycleStatusChip extends StatelessWidget {
       CycleStatus.paidOut => (colors.paidOut, Icons.payments),
       CycleStatus.unknown => (colors.unknown, Icons.help_outline),
     };
-    return StatusChip(label: cycleLabel(status), icon: icon, style: style);
+    return StatusChip(
+      label: cycleStatusText(l, status),
+      icon: icon,
+      style: style,
+    );
   }
 }

@@ -17,9 +17,12 @@ PayoutRepository payoutRepository(Ref ref) =>
 @riverpod
 Future<PayoutOrder> payoutOrder(Ref ref, String stokvelId, String cycleId) {
   // Log ids only: never a name or an amount.
-  ref.onDispose(
-    () => debugPrint('payoutOrder disposed stokvel=$stokvelId cycle=$cycleId'),
-  );
+  ref
+    ..watch(sessionScopeProvider)
+    ..onDispose(
+      () =>
+          debugPrint('payoutOrder disposed stokvel=$stokvelId cycle=$cycleId'),
+    );
   return ref
       .watch(payoutRepositoryProvider)
       .fetchOrder(stokvelId: stokvelId, cycleId: cycleId);

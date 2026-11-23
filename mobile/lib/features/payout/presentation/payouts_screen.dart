@@ -13,7 +13,8 @@ import 'package:ronditrack/features/payout/presentation/payout_chips.dart';
 import 'package:ronditrack/features/stokvel/application/stokvel_providers.dart';
 import 'package:ronditrack/features/stokvel/domain/actions.dart';
 import 'package:ronditrack/features/stokvel/domain/enums.dart';
-import 'package:ronditrack/features/stokvel/presentation/labels.dart';
+import 'package:ronditrack/l10n/generated/app_localizations.dart';
+import 'package:ronditrack/l10n/labels.dart';
 
 /// The rotation for one cycle, shown exactly as the API sends it: the order,
 /// the amounts, the dates and who is Next are the server's decisions.
@@ -25,6 +26,7 @@ class PayoutsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final provider = payoutOrderProvider(stokvelId, cycleId);
     final state = toViewState<PayoutOrder>(
       ref.watch(provider),
@@ -35,7 +37,7 @@ class PayoutsScreen extends ConsumerWidget {
     final detail = ref.watch(stokvelDetailProvider(stokvelId));
     final role = detail.hasValue ? detail.requireValue.role : null;
     return Scaffold(
-      appBar: AppBar(title: const Text('Payouts')),
+      appBar: AppBar(title: Text(l.payoutsTitle)),
       body: switch (state) {
         ViewLoading() => const LoadingView(),
         ViewEmpty() => const _EmptyPayouts(),
@@ -59,15 +61,16 @@ class _EmptyPayouts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    final l = AppLocalizations.of(context);
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('No payout order for this cycle yet.'),
-            SizedBox(height: 8),
-            Text('It appears here once your treasurer starts the rotation.'),
+            Text(l.payoutsEmptyTitle),
+            const SizedBox(height: 8),
+            Text(l.payoutsEmptyHint),
           ],
         ),
       ),
@@ -88,6 +91,7 @@ class _PayoutList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final next = order.entries
         .where((e) => e.status == PayoutStatus.next)
         .firstOrNull;
@@ -108,14 +112,10 @@ class _PayoutList extends StatelessWidget {
                 child: Align(
                   alignment: AlignmentDirectional.centerStart,
                   child: FilledButton(
-                    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Recording a payout arrives with the live API.',
-                        ),
-                      ),
-                    ),
-                    child: Text(actionLabel(StokvelAction.recordPayout)),
+                    onPressed: () => ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(l.payoutRecordSoon))),
+                    child: Text(actionText(l, StokvelAction.recordPayout)),
                   ),
                 ),
               ),
@@ -134,13 +134,14 @@ class _NextBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final style = context.statusColors.next;
     return Card(
       color: style.background,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Text(
-          'Next: ${entry.memberName}',
+          l.payoutNext(entry.memberName),
           style: Theme.of(context).textTheme.titleMedium
               ?.copyWith(color: style.foreground),
         ),
@@ -156,6 +157,7 @@ class _PayoutTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final paidOn = entry.paidOn;
     final isNext = entry.status == PayoutStatus.next;
     return Card(
@@ -171,7 +173,7 @@ class _PayoutTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${entry.position}. ${entry.memberName}',
+              l.payoutPositionLine(entry.position.toString(), entry.memberName),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             Text(formatRands(entry.amount)),
@@ -182,7 +184,7 @@ class _PayoutTile extends StatelessWidget {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 PayoutStatusChip(status: entry.status),
-                if (paidOn != null) Text('on ${formatDate(paidOn)}'),
+                if (paidOn != null) Text(l.payoutPaidOn(formatDate(paidOn))),
               ],
             ),
           ],

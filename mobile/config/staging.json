@@ -1,4 +1,6 @@
 {
   "FLAVOR": "staging",
-  "API_BASE_URL": "https://staging.ronditrack.example"
+  "API_BASE_URL": "https://staging.ronditrack.example",
+  "USE_API": "true",
+  "REFRESH_COOKIE_NAME": "refresh_token"
 }

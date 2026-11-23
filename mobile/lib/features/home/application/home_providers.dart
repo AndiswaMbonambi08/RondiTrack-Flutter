@@ -13,6 +13,7 @@ part 'home_providers.g.dart';
 /// The only place that names the implementation: fakes or the API.
 @Riverpod(keepAlive: true)
 HomeRepository homeRepository(Ref ref) {
+  ref.watch(sessionScopeProvider);
   if (ref.watch(useFakesProvider)) {
     return FakeHomeRepository(personaId: ref.watch(currentPersonaProvider));
   }

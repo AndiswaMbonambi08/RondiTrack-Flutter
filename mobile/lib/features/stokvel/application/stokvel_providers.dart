@@ -14,6 +14,7 @@ part 'stokvel_providers.g.dart';
 /// The only place that names the implementation: fakes or the API.
 @Riverpod(keepAlive: true)
 StokvelRepository stokvelRepository(Ref ref) {
+  ref.watch(sessionScopeProvider);
   if (ref.watch(useFakesProvider)) {
     return FakeStokvelRepository(personaId: ref.watch(currentPersonaProvider));
   }

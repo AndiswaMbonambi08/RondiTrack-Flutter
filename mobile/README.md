@@ -285,3 +285,50 @@ The response types are hand-written (`data/*_dto.dart`) and stop in `data/`. Rea
 - Models: hand-written, see The API client.
 - Timeouts: connect 10 s, send 15 s, receive 30 s. These are NOT yet measured against the API with its database down. Measure before relying on them.
 - Retry: only reads, and only for "no answer", three attempts. Every 4xx is final and writes are never retried. A 500 is not retried. Not yet measured.
+
+## Contract notes
+
+### Auth
+
+API commit: 49d043f42570aaca83120ed6841585e4b3d03335
+
+1. **Calls.** Register is `POST /api/v1/auth/register` with fullName, email and password (at least 12 characters). It returns 201 with the user, does not sign anyone in and sets no cookie, so the app signs in straight after with the same credentials. Login is `POST /api/v1/auth/login` with email and password and returns 200 with accessToken and expiresInSeconds, and the refresh token in Set-Cookie. Refresh is `POST /api/v1/auth/refresh` with no body and the cookie in a Cookie header; it returns the same body and a new cookie. Logout is `POST /api/v1/auth/logout` with the cookie and always returns 204.
+2. **Cookie and lifetimes.** `refresh_token=<value>; expires=<7 days>; path=/api/v1/auth; secure; samesite=strict; httponly`. The name comes from REFRESH_COOKIE_NAME in config/<flavor>.json and is never typed in code. The access token lives 15 minutes and the body says so in expiresInSeconds.
+3. **Rotation.** Every refresh rotates the token. A spent token returns 401 and revokes the whole family, the newest token included. This API has no grace window, so there is nothing to switch off for the live tests.
+4. **Claims.** sub, jti, iss, aud, iat, nbf and exp, plus role=PlatformAdmin for platform admins only. Per-stokvel roles are not in the token. The treasurer buttons come from the stokvel membership.
+5. **Logout.** A good cookie, a spent cookie and no cookie all return 204. A known cookie revokes its whole family.
+6. **Rate limits.** Login is a fixed window per IP, 5 attempts per 60 seconds, and successful sign-ins count. A 429 carries Retry-After in seconds. Register is not limited.
+7. **Joining.** Preview is `GET /api/v1/invites/{code}` and join is `POST /api/v1/invites/{code}/join`; both need a signed-in person. Join returns 201 with stokvelId. An unknown code is 404, an expired code is 410 and someone already in is 409 with the stokvelId. Repeating a join never makes a second membership.
+
+## The session
+
+- The access token lives in memory only, with its expiry. It is never written to disk or logged.
+- The refresh token lives in flutter_secure_storage behind the RefreshTokenStore interface. It is sent only to the refresh and logout endpoints as a Cookie header, through a second Dio client that has no session interceptor.
+- One interceptor owns the session. It refreshes 60 seconds before the token expires and on a 401 refreshes once and retries once. While a refresh runs every other request waits for that same refresh. A 401 for a request sent with a replaced token is retried with the new token and never refreshes again.
+- Only the refresh endpoint's own 401 ends a session. A 403, a 429, a 500 or no answer never signs anyone out.
+- On launch one refresh runs behind a splash. With no signal the person stays signed in with Try again and Sign out.
+- Sign-out wipes the access token, the stored refresh token and every user-scoped provider first, then tells the API with a 5 second timeout. A refresh that finishes after sign-out is ignored.
+
+## Running against the API
+
+`flutter run --flavor dev --dart-define-from-file=config/dev.json`
+
+No password is passed in. The dev flavour's persona menu fills in an email on the sign-in form and the password is typed. The API has no grace window, so the live tests need no setting.
+
+## Decisions
+
+- Dio is used directly for the auth calls because the cookie is in a header and the generated client returns only bodies.
+- Android backup is off (allowBackup false) because a restored token has no key to open it.
+- Refresh margin is 60 seconds on a 15 minute token.
+- dependency_overrides: objective_c 9.6.2, code_assets 2.1.0, jni 1.1.2, jni_flutter 1.0.4+1 and material_ui 1.10.0, because the newest versions were under two weeks old. Remove each once the newest version is two weeks old.
+
+### Offline, forms and lists
+
+API commit: 49d043f42570aaca83120ed6841585e4b3d03335
+
+1. **Idempotency.** Keys are required on `POST /api/v1/stokvels/{id}/contributions` and on the cycle close. The same key and body returns 201 with the first answer and `Idempotency-Replayed: true`; the same key with a different body returns 422. Keys are scoped to caller and stokvel. M is 168 hours (7 days), `Housekeeping:IdempotencyRetentionHours`. The outbox maximum age is 48 hours, shorter than M.
+2. **Refusals.** 409: cycle closed, cycle paid out, not a member, already contributed. 404: unknown stokvel, user or cycle. 403: a Member recording for someone else. 400: amount outside 1 to 100 000 000 cents. 422: key reused with another body. 429 with Retry-After: per-user token bucket, and a 429 never consumes the key. The 409s had no code; the backend PR adds one.
+3. **Edits.** Only payouts are versioned: ETag on GET, If-Match on PUT, 428 when missing, 412 when stale ("The resource was changed by someone else since you read it. Fetch it again and retry."). Stokvel and cycle edits are last write wins, so the stale-edit demo uses a payout.
+4. **Contributions list.** `GET /api/v1/stokvels/{id}/contribution-history`: pageSize default 25, largest 100; the end marker is an empty nextPageToken. Filters: member, from, to, sort, plus cycleId and status from the backend PR. from and to are UTC instants with a zone, from included and to excluded; a date without a time is 400. A token only works with the filters it came from.
+5. **Forms.** 400 errors are `errors: { field: [messages] }` in camelCase. Pay sends `amountInCents` (integer cents). Create stokvel sends `contributionAmount` as a rand JSON number today; the backend PR adds cents. Neither body has a date.
+6. **Personal data.** Proofs of payment are never downloaded or cached (the API sends them private, no-store). No ID numbers or bank details exist in the API. Names and amounts are cached in Drift only, Android backup is off, and sign-out empties the database.

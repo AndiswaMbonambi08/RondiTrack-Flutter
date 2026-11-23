@@ -1,7 +1,8 @@
-import 'package:flutter/widgets.dart' show WidgetsBinding;
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-part 'session.g.dart';
+export 'package:ronditrack/core/session/auth_controller.dart';
+export 'package:ronditrack/core/session/auth_failure.dart';
+export 'package:ronditrack/core/session/auth_state.dart';
 
 class Persona {
   const new({required this.id, required this.name});
@@ -18,9 +19,8 @@ const personas = [
   Persona(id: 'platform-admin', name: 'Platform admin'),
 ];
 
-/// Stands in for the signed-in person until Week 11.
-@Riverpod(keepAlive: true)
-class CurrentPersona extends _$CurrentPersona {
+/// Which fake person the fake repositories answer for. Fakes only.
+class CurrentPersona extends Notifier<String> {
   @override
   String build() => 'sipho';
 
@@ -29,8 +29,12 @@ class CurrentPersona extends _$CurrentPersona {
   void select(String id) => state = id;
 }
 
-/// Fake sign-in accounts, the same people as the API's demo seed.
-/// lindiwe@example.com is inactive in the API, so it is not listed.
+final currentPersonaProvider = NotifierProvider<CurrentPersona, String>(
+  CurrentPersona.new,
+);
+
+/// Demo accounts, the same people as the API's demo seed. Dev flavour only
+/// fills these into the sign-in form. The password is always typed.
 const personaEmails = <String, String>{
   'sipho@example.com': 'sipho',
   'nomsa@example.com': 'nomsa',
@@ -38,38 +42,7 @@ const personaEmails = <String, String>{
   'broken@example.com': 'broken',
 };
 
-String? personaIdForEmail(String email) =>
-    personaEmails[email.trim().toLowerCase()];
-
-/// Who is signed in: a persona id, or null when signed out.
-/// Week 11 replaces the fake with the API. The gate only reads this.
-@Riverpod(keepAlive: true)
-class Auth extends _$Auth {
-  @override
-  String? build() => null;
-
-  /// Signs in by email. Returns false for an unknown or inactive account.
-  bool signInWithEmail(String email) {
-    final id = personaIdForEmail(email);
-    if (id == null) return false;
-    signInAs(id);
-    return true;
-  }
-
-  void signInAs(String id) {
-    ref.read(currentPersonaProvider.notifier).select(id);
-    state = id;
-  }
-
-  /// The dev switcher's sign-in. It signs out first, so the last person's
-  /// screens are gone and their providers disposed before the next person's
-  /// first frame, then signs in again. The gate returns to the same address.
-  Future<void> switchTo(String id) async {
-    signOut();
-    await WidgetsBinding.instance.endOfFrame;
-    await WidgetsBinding.instance.endOfFrame;
-    signInAs(id);
-  }
-
-  void signOut() => state = null;
-}
+String? personaEmailFor(String id) => personaEmails.entries
+    .where((e) => e.value == id)
+    .map((e) => e.key)
+    .firstOrNull;

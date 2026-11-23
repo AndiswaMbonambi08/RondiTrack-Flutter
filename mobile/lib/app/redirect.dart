@@ -1,4 +1,8 @@
+import 'package:ronditrack/core/session/auth_state.dart';
+
 const signInPath = '/sign-in';
+const registerPath = '/register';
+const splashPath = '/splash';
 
 const _knownRoots = {'stokvels', 'activity', 'profile', 'join'};
 
@@ -14,22 +18,30 @@ bool isInAppAddress(String? address) {
   return _knownRoots.contains(segments.first);
 }
 
+/// The invite code in a /join/:code address, or null.
+String? joinCodeOf(String? address) {
+  if (!isInAppAddress(address)) return null;
+  final segments = Uri.parse(address!).pathSegments;
+  return segments.length == 2 && segments.first == 'join' ? segments[1] : null;
+}
+
 /// One function decides every navigation from the auth state and the
-/// address. It needs no widget, so it is tested directly.
-///
-/// Signed out: everything goes to sign-in, carrying the address in `from`.
-/// Signed in on sign-in: go to `from` when it is inside the app, else Home.
-String? redirectFor({required bool signedIn, required Uri location}) {
-  final onSignIn = location.path == signInPath;
-  if (!signedIn) {
-    if (onSignIn) return null;
-    final from = location.toString();
-    if (from == '/' || !isInAppAddress(from)) return signInPath;
-    return Uri(path: signInPath, queryParameters: {'from': from}).toString();
+/// address. While restoring every route goes to the splash and remembers
+/// where it was going. Signed out goes to sign-in with the same memory.
+String? redirectFor({required AuthState auth, required Uri location}) {
+  final path = location.path;
+  final gate = path == signInPath || path == registerPath || path == splashPath;
+  final from = location.queryParameters['from'];
+  final target = gate ? from : location.toString();
+  String withFrom(String base) {
+    if (target == null || target == '/' || !isInAppAddress(target)) return base;
+    return Uri(path: base, queryParameters: {'from': target}).toString();
   }
-  if (onSignIn) {
-    final from = location.queryParameters['from'];
-    return isInAppAddress(from) ? from : '/';
-  }
-  return null;
+
+  return switch (auth) {
+    Restoring() => path == splashPath ? null : withFrom(splashPath),
+    SignedOut() =>
+      path == signInPath || path == registerPath ? null : withFrom(signInPath),
+    SignedIn() => gate ? (isInAppAddress(from) ? from : '/') : null,
+  };
 }
