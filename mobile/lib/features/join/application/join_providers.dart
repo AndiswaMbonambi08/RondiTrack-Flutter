@@ -13,6 +13,7 @@ part 'join_providers.g.dart';
 /// The only place that names the implementation: fakes or the API.
 @Riverpod(keepAlive: true)
 InviteRepository inviteRepository(Ref ref) {
+  ref.watch(sessionScopeProvider);
   if (ref.watch(useFakesProvider)) {
     return FakeInviteRepository(personaId: ref.watch(currentPersonaProvider));
   }

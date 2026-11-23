@@ -1,21 +1,25 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ronditrack/core/network/dio_factory.dart';
-import 'package:ronditrack/core/session/access_token.dart';
+import 'package:ronditrack/core/network/network_providers.dart';
+import 'package:ronditrack/core/network/session_interceptor.dart';
+import 'package:ronditrack/core/session/auth_controller.dart';
 
-part 'dio_provider.g.dart';
-
-/// The flavour's API address. main() overrides it from the flavour config, so
-/// no address is typed into code.
-@Riverpod(keepAlive: true)
-String apiBaseUrl(Ref ref) =>
-    throw UnimplementedError('main() overrides apiBaseUrlProvider');
+export 'package:ronditrack/core/network/network_providers.dart'
+    show apiBaseUrlProvider;
 
 /// The one Dio client. Nothing outside data/ may use it.
-@Riverpod(keepAlive: true)
-Dio dio(Ref ref) => buildDio(
-  baseUrl: ref.watch(apiBaseUrlProvider),
-  readToken: () => ref.read(accessTokenProvider),
-  logSink: kDebugMode ? debugPrint : null,
-);
+final dioProvider = Provider<Dio>((ref) {
+  final session = ref.watch(sessionManagerProvider);
+  return buildDio(
+    baseUrl: ref.watch(apiBaseUrlProvider),
+    readToken: () => session.accessToken,
+    logSink: kDebugMode ? debugPrint : null,
+    session: SessionInterceptor(
+      session: session,
+      bare: ref.watch(bareDioProvider),
+      onSessionEnded: () => ref.read(authProvider.notifier).sessionEnded(),
+    ),
+  );
+});

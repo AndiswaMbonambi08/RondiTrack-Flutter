@@ -32,6 +32,7 @@ Dio buildDio({
   required String baseUrl,
   required String? Function() readToken,
   LogSink? logSink,
+  Interceptor? session,
   HttpClientAdapter? adapter,
 }) {
   final dio = Dio(
@@ -46,7 +47,25 @@ Dio buildDio({
     ),
   );
   if (adapter != null) dio.httpClientAdapter = adapter;
-  dio.interceptors.add(BearerInterceptor(readToken));
+  dio.interceptors.add(session ?? BearerInterceptor(readToken));
   if (logSink != null) dio.interceptors.add(SafeLogInterceptor(logSink));
+  return dio;
+}
+
+/// A client with no session interceptor. The refresh, the retry and the auth
+/// calls go through it, so none of them can wait on the session.
+Dio buildBareDio({required String baseUrl, HttpClientAdapter? adapter}) {
+  final dio = Dio(
+    BaseOptions(
+      baseUrl: baseUrl,
+      connectTimeout: connectTimeout,
+      sendTimeout: sendTimeout,
+      receiveTimeout: receiveTimeout,
+      headers: {
+        Headers.acceptHeader: 'application/json, application/problem+json',
+      },
+    ),
+  );
+  if (adapter != null) dio.httpClientAdapter = adapter;
   return dio;
 }

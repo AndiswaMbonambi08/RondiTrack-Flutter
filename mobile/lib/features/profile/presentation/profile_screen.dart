@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ronditrack/core/session/session.dart';
@@ -7,10 +9,6 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final id = ref.watch(authProvider);
-    final name =
-        personas.where((p) => p.id == id).map((p) => p.name).firstOrNull ??
-        'Unknown';
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
       body: Padding(
@@ -18,11 +16,11 @@ class ProfileScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Signed in as'),
-            Text(name, style: Theme.of(context).textTheme.titleLarge),
+            const Text('You are signed in.'),
             const SizedBox(height: 16),
             FilledButton(
-              onPressed: () => ref.read(authProvider.notifier).signOut(),
+              onPressed: () =>
+                  unawaited(ref.read(authProvider.notifier).signOut()),
               child: const Text('Sign out'),
             ),
           ],

@@ -13,7 +13,7 @@ GoRouter router(Ref ref) {
   final refresh = ValueNotifier<int>(0);
   ref.listen(authProvider, (_, _) => refresh.value++);
   final router = createRouter(
-    isSignedIn: () => ref.read(authProvider) != null,
+    readAuth: () => ref.read(authProvider),
     refreshListenable: refresh,
   );
   ref.onDispose(() {
