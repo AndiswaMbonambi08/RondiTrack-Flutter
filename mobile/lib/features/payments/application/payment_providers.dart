@@ -20,6 +20,9 @@ final paymentServiceProvider = Provider<PaymentService>((ref) {
 });
 
 /// This person's unsent payments in one stokvel, live from the database.
+// Reason: the family's type is in a private riverpod library, so it cannot be
+// written here without importing from lib/src.
+// ignore: specify_nonobvious_property_types
 final pendingPaymentsProvider = StreamProvider.autoDispose
     .family<List<PendingPayment>, String>((ref, stokvelId) {
       final userId = ref.watch(currentUserIdProvider);

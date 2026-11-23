@@ -15,6 +15,9 @@ final stokvelCacheProvider = Provider<StokvelCache>(
   (ref) => StokvelCache(ref.watch(appDatabaseProvider)),
 );
 
+// Reason: the family's type is in a private riverpod library, so it cannot be
+// written here without importing from lib/src.
+// ignore: specify_nonobvious_property_types
 final cachedStokvelProvider = StreamProvider.autoDispose
     .family<CachedValue<StokvelDetail>?, String>((ref, id) {
       ref.watch(sessionScopeProvider);

@@ -40,6 +40,9 @@ class SyncTracker extends Notifier<Map<String, SyncState>> {
 final syncTrackerProvider =
     NotifierProvider<SyncTracker, Map<String, SyncState>>(SyncTracker.new);
 
+// Reason: the family's type is in a private riverpod library, so it cannot be
+// written here without importing from lib/src.
+// ignore: specify_nonobvious_property_types
 final syncStateProvider = Provider.family<SyncState, String>(
   (ref, key) =>
       ref.watch(syncTrackerProvider.select((all) => all[key])) ??

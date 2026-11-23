@@ -1,5 +1,5 @@
 sealed class AuthFailure implements Exception {
-  const AuthFailure();
+  const new();
 }
 
 final class WrongCredentials extends AuthFailure {

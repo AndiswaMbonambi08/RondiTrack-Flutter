@@ -1,5 +1,5 @@
 sealed class JoinOutcome {
-  const JoinOutcome();
+  const new();
 }
 
 final class Joined extends JoinOutcome {

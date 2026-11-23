@@ -8,7 +8,7 @@ const authRefreshPath = '/api/v1/auth/refresh';
 const authLogoutPath = '/api/v1/auth/logout';
 
 sealed class RefreshOutcome {
-  const RefreshOutcome();
+  const new();
 }
 
 final class Refreshed extends RefreshOutcome {
@@ -36,7 +36,7 @@ final class Cancelled extends RefreshOutcome {
 /// refresh. [bare] is a client without the session interceptor, so a refresh
 /// can never wait on itself.
 class SessionManager {
-  SessionManager({
+  new({
     required this.bare,
     required this.store,
     required this.cookieName,

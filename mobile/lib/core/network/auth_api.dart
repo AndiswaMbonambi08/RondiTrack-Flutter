@@ -130,8 +130,9 @@ class AuthApi {
         }
       }
     }
-    if (out.isEmpty && data['detail'] is String)
+    if (out.isEmpty && data['detail'] is String) {
       out['form'] = data['detail'] as String;
+    }
     return out;
   }
 }

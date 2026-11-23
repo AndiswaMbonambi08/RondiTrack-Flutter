@@ -13,7 +13,7 @@ class SessionEnded implements Exception {
 /// sends that request again once. A 401 for a request sent with a token that
 /// has since been replaced is retried with the new token, never refreshed.
 class SessionInterceptor extends Interceptor {
-  SessionInterceptor({
+  new({
     required this.session,
     required this.bare,
     required this.onSessionEnded,

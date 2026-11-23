@@ -1,7 +1,7 @@
 /// Three states. The compiler lists every switch that has to decide what
 /// restoring means.
 sealed class AuthState {
-  const AuthState();
+  const new();
 }
 
 final class SignedOut extends AuthState {

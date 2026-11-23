@@ -10,11 +10,8 @@ import 'package:ronditrack/features/payments/domain/payment_outcome.dart';
 const outboxMaxAge = Duration(hours: 48);
 
 class PaymentService {
-  PaymentService({
-    required this.store,
-    required this.api,
-    DateTime Function()? clock,
-  }) : _clock = clock ?? DateTime.now;
+  new({required this.store, required this.api, DateTime Function()? clock})
+    : _clock = clock ?? DateTime.now;
 
   final OutboxStore store;
   final PaymentApi api;
@@ -36,7 +33,8 @@ class PaymentService {
       amount: amount,
       now: _clock().toUtc(),
     );
-    return send(entry.id);
+    final outcome = await send(entry.id);
+    return outcome;
   }
 
   /// Every attempt sends the key that was stored with the payment: after a

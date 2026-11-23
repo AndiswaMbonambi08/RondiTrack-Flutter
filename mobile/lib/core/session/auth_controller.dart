@@ -45,10 +45,7 @@ class Auth extends Notifier<AuthState> {
     }
   }
 
-  Future<void> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     final grant = await ref
         .read(authApiProvider)
         .login(email: email, password: password);

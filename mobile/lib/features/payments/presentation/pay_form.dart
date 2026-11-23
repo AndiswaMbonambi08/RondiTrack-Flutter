@@ -114,7 +114,8 @@ class _PayFormState extends ConsumerState<PayForm> {
     final l = AppLocalizations.of(context);
     switch (outcome) {
       case PaymentPaid():
-        // Anything that brings fresh data tells the screens, so the banner goes.
+        // Anything that brings fresh data tells the screens, so the
+        // banner goes.
         unawaited(ref.read(homeRefreshProvider)());
         unawaited(ref.read(stokvelRefreshProvider)(widget.stokvelId));
         final messenger = ScaffoldMessenger.of(context);
