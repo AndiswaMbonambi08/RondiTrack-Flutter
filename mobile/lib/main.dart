@@ -2,8 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ronditrack/app/app.dart';
 import 'package:ronditrack/app/config.dart';
+import 'package:ronditrack/app/config_provider.dart';
+import 'package:ronditrack/app/retry.dart';
 
 void main() {
   final config = AppConfig.fromEnvironment();
-  runApp(ProviderScope(child: RondiTrackApp(config: config)));
+  runApp(
+    ProviderScope(
+      retry: appRetry,
+      overrides: [appConfigProvider.overrideWithValue(config)],
+      child: RondiTrackApp(config: config),
+    ),
+  );
 }

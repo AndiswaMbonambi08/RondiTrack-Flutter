@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ronditrack/app/config.dart';
+import 'package:ronditrack/app/config_provider.dart';
+import 'package:ronditrack/app/retry.dart';
 import 'package:ronditrack/app/router.dart';
 import 'package:ronditrack/core/session/session.dart';
 import 'package:ronditrack/core/theme/app_theme.dart';
@@ -10,6 +13,8 @@ import 'package:ronditrack/features/home/application/home_providers.dart';
 import 'package:ronditrack/features/home/data/fake_home_repository.dart';
 import 'package:ronditrack/features/join/application/join_providers.dart';
 import 'package:ronditrack/features/join/data/fake_invite_repository.dart';
+import 'package:ronditrack/features/payout/application/payout_providers.dart';
+import 'package:ronditrack/features/payout/data/fake_payout_repository.dart';
 import 'package:ronditrack/features/stokvel/application/stokvel_providers.dart';
 import 'package:ronditrack/features/stokvel/data/fake_stokvel_repository.dart';
 
@@ -58,14 +63,18 @@ Future<AppHarness> pumpApp(
   String? signedInAs,
   Size size = const Size(400, 800),
   double textScale = 1,
+  Flavor flavor = Flavor.dev,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
-      retry: (retryCount, error) => null,
+      retry: appRetry,
       overrides: [
+        appConfigProvider.overrideWithValue(
+          AppConfig(flavor: flavor, apiBaseUrl: 'http://localhost'),
+        ),
         homeRepositoryProvider.overrideWith(
           (ref) => FakeHomeRepository(
             personaId: ref.watch(currentPersonaProvider),
@@ -80,6 +89,12 @@ Future<AppHarness> pumpApp(
         ),
         activityRepositoryProvider.overrideWith(
           (ref) => FakeActivityRepository(
+            personaId: ref.watch(currentPersonaProvider),
+            delayScale: 0,
+          ),
+        ),
+        payoutRepositoryProvider.overrideWith(
+          (ref) => FakePayoutRepository(
             personaId: ref.watch(currentPersonaProvider),
             delayScale: 0,
           ),

@@ -12,6 +12,9 @@ const seedMemberships = <String, List<Membership>>{
   'nomsa': [
     Membership(stokvelId: 'umoja-family-fund', role: StokvelRole.admin),
   ],
+  'mpho': [
+    Membership(stokvelId: 'ubuntu-savings-circle', role: StokvelRole.member),
+  ],
   'platform-admin': [],
 };
 
@@ -125,6 +128,14 @@ final seedFigures = <String, Map<String, HomeFigures>>{
   'nomsa': {
     'umoja-family-fund': (
       paid: const Cents(450000),
+      owed: Cents.zero,
+      arrears: Cents.zero,
+      nextPayout: DateTime.utc(2026, 11, 30, 21, 59, 59),
+    ),
+  },
+  'mpho': {
+    'ubuntu-savings-circle': (
+      paid: const Cents(150000),
       owed: Cents.zero,
       arrears: Cents.zero,
       nextPayout: DateTime.utc(2026, 11, 30, 21, 59, 59),

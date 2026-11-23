@@ -10,7 +10,6 @@ import 'package:ronditrack/core/view_state.dart';
 import 'package:ronditrack/core/widgets.dart';
 import 'package:ronditrack/features/home/application/home_providers.dart';
 import 'package:ronditrack/features/home/domain/home_entry.dart';
-import 'package:ronditrack/features/home/presentation/persona_menu.dart';
 import 'package:ronditrack/features/stokvel/presentation/labels.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -23,10 +22,7 @@ class HomeScreen extends ConsumerWidget {
       isEmpty: (entries) => entries.isEmpty,
     );
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('RondiTrack'),
-        actions: const [PersonaMenu()],
-      ),
+      appBar: AppBar(title: const Text('RondiTrack')),
       body: switch (state) {
         ViewLoading() => const LoadingView(),
         ViewEmpty() => const _EmptyHome(),
