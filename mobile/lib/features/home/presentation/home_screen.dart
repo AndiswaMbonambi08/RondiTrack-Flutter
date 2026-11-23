@@ -137,7 +137,9 @@ class _StokvelCard extends ConsumerWidget {
               for (final p in pending)
                 Row(
                   children: [
-                    const ExcludeSemantics(child: Icon(Icons.schedule, size: 18)),
+                    const ExcludeSemantics(
+                      child: Icon(Icons.schedule, size: 18),
+                    ),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(l.payPendingLabel(formatRands(p.amount))),

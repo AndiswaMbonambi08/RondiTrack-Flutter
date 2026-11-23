@@ -14,7 +14,7 @@ final homeCacheProvider = Provider<HomeCache>(
 );
 
 /// What the phone has, at once, with or without signal.
-final cachedHomeProvider =
+final StreamProvider<CachedValue<List<HomeEntry>>?> cachedHomeProvider =
     StreamProvider.autoDispose<CachedValue<List<HomeEntry>>?>((ref) {
       ref.watch(sessionScopeProvider);
       return ref.watch(homeCacheProvider).watch();

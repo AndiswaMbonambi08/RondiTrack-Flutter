@@ -55,17 +55,15 @@ class ProfileScreen extends ConsumerWidget {
         children: [
           Text(l.profileSignedIn),
           const SizedBox(height: 16),
-          Text(
-            l.languageTitle,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          Text(l.languageTitle, style: Theme.of(context).textTheme.titleMedium),
           for (final (code, label) in languages)
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(label),
               selected: current == code,
               trailing: current == code ? const Icon(Icons.check) : null,
-              onTap: () => unawaited(ref.read(localeProvider.notifier).choose(code)),
+              onTap: () =>
+                  unawaited(ref.read(localeProvider.notifier).choose(code)),
             ),
           const SizedBox(height: 16),
           FilledButton(

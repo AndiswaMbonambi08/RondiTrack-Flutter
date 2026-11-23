@@ -24,21 +24,18 @@ class HomeCache {
       final rows = await (_db.select(
         _db.homeRows,
       )..orderBy([(t) => OrderingTerm.asc(t.position)])).get();
-      return CachedValue(
-        [
-          for (final r in rows)
-            HomeEntry(
-              stokvelId: r.stokvelId,
-              name: r.name,
-              role: StokvelRole.parse(r.role),
-              paid: Cents(r.paidCents),
-              owed: Cents(r.owedCents),
-              arrears: Cents(r.arrearsCents),
-              nextPayout: r.nextPayoutUtc?.toUtc(),
-            ),
-        ],
-        m.fetchedAt.toUtc(),
-      );
+      return CachedValue([
+        for (final r in rows)
+          HomeEntry(
+            stokvelId: r.stokvelId,
+            name: r.name,
+            role: StokvelRole.parse(r.role),
+            paid: Cents(r.paidCents),
+            owed: Cents(r.owedCents),
+            arrears: Cents(r.arrearsCents),
+            nextPayout: r.nextPayoutUtc?.toUtc(),
+          ),
+      ], m.fetchedAt.toUtc());
     });
   }
 
