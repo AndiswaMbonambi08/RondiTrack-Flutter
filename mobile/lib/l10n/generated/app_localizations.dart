@@ -296,6 +296,18 @@ abstract class AppLocalizations {
   /// **'Stokvel'**
   String get stokvelTitle;
 
+  /// No description provided for @stokvelsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stokvels'**
+  String get stokvelsTitle;
+
+  /// No description provided for @selectStokvel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a stokvel'**
+  String get selectStokvel;
+
   /// No description provided for @switchStokvel.
   ///
   /// In en, this message translates to:
@@ -367,6 +379,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Record payout'**
   String get actionRecordPayout;
+
+  /// No description provided for @payoutsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payouts'**
+  String get payoutsTitle;
+
+  /// No description provided for @payoutsEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No payout order for this cycle yet.'**
+  String get payoutsEmptyTitle;
+
+  /// No description provided for @payoutsEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'It appears here once your treasurer starts the rotation.'**
+  String get payoutsEmptyHint;
+
+  /// No description provided for @payoutNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {name}'**
+  String payoutNext(String name);
+
+  /// No description provided for @payoutPositionLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{position}. {name}'**
+  String payoutPositionLine(String position, String name);
+
+  /// No description provided for @payoutPaidOn.
+  ///
+  /// In en, this message translates to:
+  /// **'on {date}'**
+  String payoutPaidOn(String date);
+
+  /// No description provided for @payoutRecordSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording a payout arrives with the live API.'**
+  String get payoutRecordSoon;
 
   /// No description provided for @noContributions.
   ///

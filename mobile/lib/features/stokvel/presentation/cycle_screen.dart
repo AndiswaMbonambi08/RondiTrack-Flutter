@@ -108,7 +108,9 @@ class _CycleBody extends StatelessWidget {
           children: [
             Text(l.cycleLine(cycle.number, formatDate(cycle.dueDate))),
             Chip(
-              avatar: ExcludeSemantics(child: Icon(cycleStatusIcon(cycle.status))),
+              avatar: ExcludeSemantics(
+                child: Icon(cycleStatusIcon(cycle.status)),
+              ),
               label: Text(cycleStatusText(l, cycle.status)),
             ),
           ],

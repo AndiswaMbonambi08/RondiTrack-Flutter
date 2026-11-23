@@ -6,8 +6,9 @@ import 'package:ronditrack/core/view_state.dart';
 import 'package:ronditrack/core/widgets.dart';
 import 'package:ronditrack/features/home/application/home_providers.dart';
 import 'package:ronditrack/features/home/domain/home_entry.dart';
-import 'package:ronditrack/features/stokvel/presentation/labels.dart';
 import 'package:ronditrack/features/stokvel/presentation/stokvel_detail_screen.dart';
+import 'package:ronditrack/l10n/generated/app_localizations.dart';
+import 'package:ronditrack/l10n/labels.dart';
 
 const _listPaneWidth = 340.0;
 
@@ -19,6 +20,7 @@ class StokvelsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
     final sideBySide = windowSizeOf(context) == WindowSize.expanded;
     final id = selectedId;
     final state = toViewState<List<HomeEntry>>(
@@ -26,12 +28,10 @@ class StokvelsScreen extends ConsumerWidget {
       isEmpty: (entries) => entries.isEmpty,
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('Stokvels')),
+      appBar: AppBar(title: Text(l.stokvelsTitle)),
       body: switch (state) {
         ViewLoading() => const LoadingView(),
-        ViewEmpty() => const Center(
-          child: Text('You are not in any stokvels yet.'),
-        ),
+        ViewEmpty() => Center(child: Text(l.homeEmptyTitle)),
         ViewData(:final data) =>
           sideBySide
               ? Row(
@@ -43,7 +43,7 @@ class StokvelsScreen extends ConsumerWidget {
                     const VerticalDivider(width: 1),
                     Expanded(
                       child: id == null
-                          ? const Center(child: Text('Select a stokvel'))
+                          ? Center(child: Text(l.selectStokvel))
                           : StokvelDetailScreen(stokvelId: id, embedded: true),
                     ),
                   ],
@@ -67,13 +67,14 @@ class _StokvelList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return ListView(
       key: const PageStorageKey<String>('stokvels-list'),
       children: [
         for (final e in entries)
           ListTile(
             title: Text(e.name),
-            subtitle: Text('Your role: ${roleLabel(e.role)}'),
+            subtitle: Text(l.yourRole(roleText(l, e.role))),
             selected: e.stokvelId == selectedId,
             trailing: const Icon(Icons.chevron_right),
             onTap: () => StokvelRoute(id: e.stokvelId).go(context),

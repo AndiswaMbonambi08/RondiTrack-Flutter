@@ -146,6 +146,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get stokvelTitle => 'Stokvel';
 
   @override
+  String get stokvelsTitle => 'Stokvels';
+
+  @override
+  String get selectStokvel => 'Select a stokvel';
+
+  @override
   String get switchStokvel => 'Switch stokvel';
 
   @override
@@ -182,6 +188,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionRecordPayout => 'Record payout';
+
+  @override
+  String get payoutsTitle => 'Payouts';
+
+  @override
+  String get payoutsEmptyTitle => 'No payout order for this cycle yet.';
+
+  @override
+  String get payoutsEmptyHint =>
+      'It appears here once your treasurer starts the rotation.';
+
+  @override
+  String payoutNext(String name) {
+    return 'Next: $name';
+  }
+
+  @override
+  String payoutPositionLine(String position, String name) {
+    return '$position. $name';
+  }
+
+  @override
+  String payoutPaidOn(String date) {
+    return 'on $date';
+  }
+
+  @override
+  String get payoutRecordSoon =>
+      'Recording a payout arrives with the live API.';
 
   @override
   String get noContributions => 'No contributions yet.';

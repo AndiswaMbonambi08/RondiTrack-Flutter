@@ -146,6 +146,12 @@ class AppLocalizationsZu extends AppLocalizations {
   String get stokvelTitle => 'I-stokvel';
 
   @override
+  String get stokvelsTitle => 'Ama-stokvel';
+
+  @override
+  String get selectStokvel => 'Khetha i-stokvel';
+
+  @override
   String get switchStokvel => 'Shintsha i-stokvel';
 
   @override
@@ -182,6 +188,36 @@ class AppLocalizationsZu extends AppLocalizations {
 
   @override
   String get actionRecordPayout => 'Qopha inkokhelo';
+
+  @override
+  String get payoutsTitle => 'Izinkokhelo';
+
+  @override
+  String get payoutsEmptyTitle =>
+      'Akukabikho ukuhleleka kwezinkokhelo kulo mjikelezo.';
+
+  @override
+  String get payoutsEmptyHint =>
+      'Kuzovela lapha uma umgcini wezimali wakho eqala ukujikeleza.';
+
+  @override
+  String payoutNext(String name) {
+    return 'Olandelayo: $name';
+  }
+
+  @override
+  String payoutPositionLine(String position, String name) {
+    return '$position. $name';
+  }
+
+  @override
+  String payoutPaidOn(String date) {
+    return 'ngo-$date';
+  }
+
+  @override
+  String get payoutRecordSoon =>
+      'Ukuqopha inkokhelo kuzofika nge-API ebukhoma.';
 
   @override
   String get noContributions => 'Azikho iminikelo okwamanje.';
