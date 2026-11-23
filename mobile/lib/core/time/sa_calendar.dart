@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart' show immutable;
+
 /// South Africa is UTC+2 all year (SAST, no daylight saving). Everything here
 /// is UTC arithmetic, so the phone's own time zone changes nothing.
 const saOffset = Duration(hours: 2);
 
 /// One calendar day in South Africa.
+@immutable
 class SaDay {
   const new(this.year, this.month, this.day);
 
@@ -45,5 +48,6 @@ class SaRange {
   DateTime get toUtc => last.endUtc;
 }
 
-/// A UTC instant with a zone, the form the API accepts: 2026-10-31T22:00:00.000Z
+/// A UTC instant with a zone, the form the API accepts, for example
+/// 2026-10-31T22:00:00.000Z
 String instantParam(DateTime instant) => instant.toUtc().toIso8601String();

@@ -6,6 +6,7 @@ import 'package:ronditrack/app/config_provider.dart';
 import 'package:ronditrack/app/redirect.dart';
 import 'package:ronditrack/app/routes.dart';
 import 'package:ronditrack/core/session/session.dart';
+import 'package:ronditrack/l10n/generated/app_localizations.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
   const new({this.from, super.key});
@@ -64,23 +65,21 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     });
   }
 
-  String _message(AuthFailure failure) => switch (failure) {
-    WrongCredentials() => 'The email and password do not match.',
-    RateLimited(:final retryAfter) =>
-      'Too many attempts. You can try again in ${retryAfter.inSeconds} seconds.',
-    NetworkDown() => 'Could not reach RondiTrack. Check your connection.',
-    FieldErrors() => 'Check your email and password.',
-    EmailTaken() ||
-    ServerFailure() ||
-    AccountCreated() => 'Something went wrong. Try again.',
+  String _message(AppLocalizations l, AuthFailure failure) => switch (failure) {
+    WrongCredentials() => l.signInWrongCredentials,
+    RateLimited(:final retryAfter) => l.signInRateLimited(retryAfter.inSeconds),
+    NetworkDown() => l.signInNetworkDown,
+    FieldErrors() => l.signInFieldErrors,
+    EmailTaken() || ServerFailure() || AccountCreated() => l.signInGenericError,
   };
 
   Future<void> _submit() async {
     if (_busy || _wait > 0) return;
+    final l = AppLocalizations.of(context);
     final email = _email.text.trim();
     final password = _password.text;
     if (email.isEmpty || password.isEmpty) {
-      setState(() => _error = 'Enter your email and password.');
+      setState(() => _error = l.signInEnterBoth);
       return;
     }
     setState(() {
@@ -98,7 +97,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       if (!mounted) return;
       setState(() {
         _busy = false;
-        _error = _message(failure);
+        _error = _message(l, failure);
       });
       if (failure is RateLimited) _startWait(failure.retryAfter);
       return;
@@ -108,23 +107,24 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final dev = ref.watch(appConfigProvider).devToolsEnabled;
     final joining = joinCodeOf(widget.from) != null;
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign in')),
+      appBar: AppBar(title: Text(l.signInTitle)),
       body: AutofillGroup(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             if (joining)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: Text('Sign in to join the stokvel you were invited to.'),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(l.signInJoining),
               )
             else if (widget.from != null)
-              const Padding(
-                padding: EdgeInsets.only(bottom: 12),
-                child: Text('Sign in to open the link you followed.'),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(l.signInFollowLink),
               ),
             TextField(
               controller: _email,
@@ -134,7 +134,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 AutofillHints.username,
                 AutofillHints.email,
               ],
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: InputDecoration(labelText: l.emailLabel),
             ),
             const SizedBox(height: 12),
             TextField(
@@ -142,9 +142,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
               obscureText: _obscure,
               autofillHints: const [AutofillHints.password],
               decoration: InputDecoration(
-                labelText: 'Password',
+                labelText: l.passwordLabel,
                 suffixIcon: IconButton(
-                  tooltip: _obscure ? 'Show password' : 'Hide password',
+                  tooltip: _obscure ? l.showPassword : l.hidePassword,
                   icon: Icon(
                     _obscure ? Icons.visibility : Icons.visibility_off,
                   ),
@@ -176,15 +176,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : Text(_wait > 0 ? 'Try again in ${_wait}s' : 'Sign in'),
+                  : Text(_wait > 0 ? l.signInWait(_wait) : l.signInButton),
             ),
             TextButton(
               onPressed: () => RegisterRoute(from: widget.from).go(context),
-              child: const Text('Create an account'),
+              child: Text(l.createAccount),
             ),
             if (dev) ...[
               const SizedBox(height: 24),
-              const Text('Demo accounts (made-up data). Type the password.'),
+              Text(l.signInDemoHint),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,

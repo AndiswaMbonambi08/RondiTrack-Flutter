@@ -560,6 +560,126 @@ abstract class AppLocalizations {
   /// **'Sign out anyway'**
   String get signOutConfirm;
 
+  /// No description provided for @splashOfflineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection'**
+  String get splashOfflineTitle;
+
+  /// No description provided for @splashOfflineBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You are still signed in. Check your connection and try again.'**
+  String get splashOfflineBody;
+
+  /// No description provided for @splashRestoring.
+  ///
+  /// In en, this message translates to:
+  /// **'Restoring your session'**
+  String get splashRestoring;
+
+  /// No description provided for @signInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signInTitle;
+
+  /// No description provided for @signInButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signInButton;
+
+  /// No description provided for @emailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailLabel;
+
+  /// No description provided for @passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordLabel;
+
+  /// No description provided for @showPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get showPassword;
+
+  /// No description provided for @hidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get hidePassword;
+
+  /// No description provided for @createAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account'**
+  String get createAccount;
+
+  /// No description provided for @signInEnterBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email and password.'**
+  String get signInEnterBoth;
+
+  /// No description provided for @signInWrongCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'The email and password do not match.'**
+  String get signInWrongCredentials;
+
+  /// No description provided for @signInRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Too many attempts. You can try again in 1 second.} other{Too many attempts. You can try again in {count} seconds.}}'**
+  String signInRateLimited(int count);
+
+  /// No description provided for @signInNetworkDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not reach RondiTrack. Check your connection.'**
+  String get signInNetworkDown;
+
+  /// No description provided for @signInFieldErrors.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email and password.'**
+  String get signInFieldErrors;
+
+  /// No description provided for @signInGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Try again.'**
+  String get signInGenericError;
+
+  /// No description provided for @signInWait.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Try again in 1 second} other{Try again in {count} seconds}}'**
+  String signInWait(int count);
+
+  /// No description provided for @signInJoining.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to join the stokvel you were invited to.'**
+  String get signInJoining;
+
+  /// No description provided for @signInFollowLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to open the link you followed.'**
+  String get signInFollowLink;
+
+  /// No description provided for @signInDemoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo accounts (made-up data). Type the password.'**
+  String get signInDemoHint;
+
   /// No description provided for @languageTitle.
   ///
   /// In en, this message translates to:

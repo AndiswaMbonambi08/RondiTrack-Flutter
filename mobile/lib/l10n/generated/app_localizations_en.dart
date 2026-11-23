@@ -319,6 +319,86 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signOutConfirm => 'Sign out anyway';
 
   @override
+  String get splashOfflineTitle => 'No connection';
+
+  @override
+  String get splashOfflineBody =>
+      'You are still signed in. Check your connection and try again.';
+
+  @override
+  String get splashRestoring => 'Restoring your session';
+
+  @override
+  String get signInTitle => 'Sign in';
+
+  @override
+  String get signInButton => 'Sign in';
+
+  @override
+  String get emailLabel => 'Email';
+
+  @override
+  String get passwordLabel => 'Password';
+
+  @override
+  String get showPassword => 'Show password';
+
+  @override
+  String get hidePassword => 'Hide password';
+
+  @override
+  String get createAccount => 'Create an account';
+
+  @override
+  String get signInEnterBoth => 'Enter your email and password.';
+
+  @override
+  String get signInWrongCredentials => 'The email and password do not match.';
+
+  @override
+  String signInRateLimited(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Too many attempts. You can try again in $count seconds.',
+      one: 'Too many attempts. You can try again in 1 second.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get signInNetworkDown =>
+      'Could not reach RondiTrack. Check your connection.';
+
+  @override
+  String get signInFieldErrors => 'Check your email and password.';
+
+  @override
+  String get signInGenericError => 'Something went wrong. Try again.';
+
+  @override
+  String signInWait(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Try again in $count seconds',
+      one: 'Try again in 1 second',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get signInJoining =>
+      'Sign in to join the stokvel you were invited to.';
+
+  @override
+  String get signInFollowLink => 'Sign in to open the link you followed.';
+
+  @override
+  String get signInDemoHint =>
+      'Demo accounts (made-up data). Type the password.';
+
+  @override
   String get languageTitle => 'Language';
 
   @override

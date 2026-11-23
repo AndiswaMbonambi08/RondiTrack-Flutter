@@ -321,6 +321,87 @@ class AppLocalizationsZu extends AppLocalizations {
   String get signOutConfirm => 'Phuma noma kunjalo';
 
   @override
+  String get splashOfflineTitle => 'Awunalo uxhumano';
+
+  @override
+  String get splashOfflineBody =>
+      'Usangene. Hlola uxhumano lwakho bese uzama futhi.';
+
+  @override
+  String get splashRestoring => 'Kubuyiswa iseshini yakho';
+
+  @override
+  String get signInTitle => 'Ngena';
+
+  @override
+  String get signInButton => 'Ngena';
+
+  @override
+  String get emailLabel => 'I-imeyili';
+
+  @override
+  String get passwordLabel => 'Iphasiwedi';
+
+  @override
+  String get showPassword => 'Khombisa iphasiwedi';
+
+  @override
+  String get hidePassword => 'Fihla iphasiwedi';
+
+  @override
+  String get createAccount => 'Dala i-akhawunti';
+
+  @override
+  String get signInEnterBoth => 'Faka i-imeyili nephasiwedi yakho.';
+
+  @override
+  String get signInWrongCredentials => 'I-imeyili nephasiwedi akufani.';
+
+  @override
+  String signInRateLimited(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Imizamo eminingi kakhulu. Ungazama futhi ngemuva kwamasekhondi angu-$count.',
+      one:
+          'Imizamo eminingi kakhulu. Ungazama futhi ngemuva kwesekhondi eli-1.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get signInNetworkDown =>
+      'Asikwazanga ukufinyelela i-RondiTrack. Hlola uxhumano lwakho.';
+
+  @override
+  String get signInFieldErrors => 'Hlola i-imeyili nephasiwedi yakho.';
+
+  @override
+  String get signInGenericError => 'Kukhona okungahambanga kahle. Zama futhi.';
+
+  @override
+  String signInWait(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Zama futhi ngemuva kwamasekhondi angu-$count',
+      one: 'Zama futhi ngemuva kwesekhondi eli-1',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get signInJoining => 'Ngena ukuze ujoyine i-stokvel obumeniwe kuyo.';
+
+  @override
+  String get signInFollowLink => 'Ngena ukuze uvule isixhumanisi osilandele.';
+
+  @override
+  String get signInDemoHint =>
+      'Ama-akhawunti okuboniswa (idatha eqanjiwe). Bhala iphasiwedi.';
+
+  @override
   String get languageTitle => 'Ulimi';
 
   @override
