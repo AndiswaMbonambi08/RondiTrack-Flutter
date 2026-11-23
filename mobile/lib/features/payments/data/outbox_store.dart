@@ -34,6 +34,11 @@ class OutboxStore {
     return query.watch().map((rows) => rows.map(_toDomain).toList());
   }
 
+  /// Every unsent payment on this phone. Sign-out empties the outbox, so it
+  /// asks first when this is above zero.
+  Future<int> countAll() async =>
+      (await _db.select(_db.outboxRows).get()).length;
+
   Future<PendingPayment?> find(String id) async {
     final row = await (_db.select(
       _db.outboxRows,
