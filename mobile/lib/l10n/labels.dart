@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ronditrack/core/failure/failure.dart';
+import 'package:ronditrack/features/stokvel/domain/actions.dart';
 import 'package:ronditrack/features/stokvel/domain/enums.dart';
 import 'package:ronditrack/l10n/generated/app_localizations.dart';
 
@@ -38,6 +39,15 @@ IconData cycleStatusIcon(CycleStatus s) => switch (s) {
   CycleStatus.closed => Icons.lock_outline,
   CycleStatus.paidOut => Icons.payments_outlined,
   CycleStatus.unknown => Icons.help_outline,
+};
+
+/// The treasurer and member action buttons, in the chosen language.
+String actionText(AppLocalizations l, StokvelAction a) => switch (a) {
+  StokvelAction.pay => l.actionPay,
+  StokvelAction.uploadProof => l.actionUploadProof,
+  StokvelAction.confirmContributions => l.actionConfirmContributions,
+  StokvelAction.closeCycle => l.actionCloseCycle,
+  StokvelAction.recordPayout => l.actionRecordPayout,
 };
 
 String failureText(AppLocalizations l, Failure f) => switch (f) {

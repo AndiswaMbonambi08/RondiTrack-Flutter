@@ -12,8 +12,6 @@ import 'package:ronditrack/features/stokvel/domain/actions.dart';
 import 'package:ronditrack/features/stokvel/domain/enums.dart';
 import 'package:ronditrack/features/stokvel/domain/models.dart';
 import 'package:ronditrack/features/stokvel/presentation/contribution_line.dart';
-import 'package:ronditrack/features/stokvel/presentation/labels.dart'
-    show actionLabel;
 import 'package:ronditrack/l10n/generated/app_localizations.dart';
 import 'package:ronditrack/l10n/labels.dart';
 
@@ -54,7 +52,9 @@ class StokvelDetailBody extends ConsumerWidget {
             children: [
               Text(l.cycleLine(cycle.number, formatDate(cycle.dueDate))),
               Chip(
-                avatar: ExcludeSemantics(child: Icon(cycleStatusIcon(cycle.status))),
+                avatar: ExcludeSemantics(
+                  child: Icon(cycleStatusIcon(cycle.status)),
+                ),
                 label: Text(cycleStatusText(l, cycle.status)),
               ),
             ],
@@ -88,7 +88,7 @@ class StokvelDetailBody extends ConsumerWidget {
               if (actions.contains(a))
                 FilledButton.tonal(
                   onPressed: () {},
-                  child: Text(actionLabel(a)),
+                  child: Text(actionText(l, a)),
                 ),
           ],
         ),
@@ -106,7 +106,8 @@ class StokvelDetailBody extends ConsumerWidget {
         if (detail.contributions.isEmpty)
           Text(l.noContributions)
         else
-          for (final c in detail.contributions) ContributionLine(contribution: c),
+          for (final c in detail.contributions)
+            ContributionLine(contribution: c),
       ],
     );
   }
