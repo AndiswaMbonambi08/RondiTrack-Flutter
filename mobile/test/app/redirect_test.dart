@@ -1,12 +1,35 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ronditrack/app/redirect.dart';
+import 'package:ronditrack/core/session/auth_state.dart';
 
-String? _go(String to, {required bool signedIn}) =>
-    redirectFor(signedIn: signedIn, location: Uri.parse(to));
+String? _go(String to, {required bool signedIn}) => redirectFor(
+  auth: signedIn
+      ? const SignedIn(userId: 'u1', sessionId: 1)
+      : const SignedOut(),
+  location: Uri.parse(to),
+);
+
+String? _restoring(String to) =>
+    redirectFor(auth: const Restoring(), location: Uri.parse(to));
 
 Uri _target(String? r) => Uri.parse(r!);
 
 void main() {
+  group('restoring', () {
+    test(
+      'every address goes to the splash and remembers where it was going',
+      () {
+        final t = _target(_restoring('/stokvels/umoja-family-fund'));
+        expect(t.path, '/splash');
+        expect(t.queryParameters['from'], '/stokvels/umoja-family-fund');
+      },
+    );
+
+    test('the splash itself is left alone', () {
+      expect(_restoring('/splash'), isNull);
+    });
+  });
+
   group('signed out', () {
     test('a stokvel link goes to sign-in and remembers the address', () {
       final t = _target(_go('/stokvels/umoja-family-fund', signedIn: false));

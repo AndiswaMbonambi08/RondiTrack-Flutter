@@ -4,14 +4,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ronditrack/app/routes.dart';
+import 'package:ronditrack/core/session/session.dart';
 import 'package:ronditrack/features/home/application/home_providers.dart';
 import 'package:ronditrack/features/home/data/fake_home_repository.dart';
 import 'package:ronditrack/features/stokvel/application/stokvel_providers.dart';
 import 'package:ronditrack/features/stokvel/data/fake_stokvel_repository.dart';
 import 'package:ronditrack/features/stokvel/domain/models.dart';
 import 'package:ronditrack/features/stokvel/presentation/stokvel_detail_screen.dart';
+import 'package:ronditrack/l10n/generated/app_localizations.dart';
 
+import '../support/overrides.dart';
 import '../support/stubs.dart';
+
+Widget _screen({
+  required String persona,
+  required String stokvelId,
+  required List<Override> repos,
+}) => ProviderScope(
+  retry: (retryCount, error) => null,
+  overrides: [
+    ...baseOverrides(signedInAs: persona),
+    ...repos,
+  ],
+  child: MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: StokvelDetailScreen(stokvelId: stokvelId),
+  ),
+);
 
 void main() {
   final home = FakeHomeRepository(personaId: 'sipho', delayScale: 0);
@@ -19,15 +39,13 @@ void main() {
 
   testWidgets('Treasurer actions appear where he is Treasurer', (tester) async {
     await tester.pumpWidget(
-      ProviderScope(
-        retry: (retryCount, error) => null,
-        overrides: [
+      _screen(
+        persona: 'sipho',
+        stokvelId: 'umoja-family-fund',
+        repos: [
           homeRepositoryProvider.overrideWithValue(home),
           stokvelRepositoryProvider.overrideWithValue(sipho),
         ],
-        child: const MaterialApp(
-          home: StokvelDetailScreen(stokvelId: 'umoja-family-fund'),
-        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -37,15 +55,13 @@ void main() {
 
   testWidgets('and nowhere else', (tester) async {
     await tester.pumpWidget(
-      ProviderScope(
-        retry: (retryCount, error) => null,
-        overrides: [
+      _screen(
+        persona: 'sipho',
+        stokvelId: 'ubuntu-savings-circle',
+        repos: [
           homeRepositoryProvider.overrideWithValue(home),
           stokvelRepositoryProvider.overrideWithValue(sipho),
         ],
-        child: const MaterialApp(
-          home: StokvelDetailScreen(stokvelId: 'ubuntu-savings-circle'),
-        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -57,9 +73,10 @@ void main() {
 
   testWidgets('a stokvel that is not yours reads as not found', (tester) async {
     await tester.pumpWidget(
-      ProviderScope(
-        retry: (retryCount, error) => null,
-        overrides: [
+      _screen(
+        persona: 'platform-admin',
+        stokvelId: 'umoja-family-fund',
+        repos: [
           homeRepositoryProvider.overrideWithValue(
             FakeHomeRepository(personaId: 'platform-admin', delayScale: 0),
           ),
@@ -67,9 +84,6 @@ void main() {
             FakeStokvelRepository(personaId: 'platform-admin', delayScale: 0),
           ),
         ],
-        child: const MaterialApp(
-          home: StokvelDetailScreen(stokvelId: 'umoja-family-fund'),
-        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -81,7 +95,7 @@ void main() {
   testWidgets('never the wrong stokvel, not for a frame', (tester) async {
     final slow = Completer<StokvelDetail>();
     final router = createRouter(
-      isSignedIn: () => true,
+      readAuth: () => const SignedIn(userId: 'sipho', sessionId: 1),
       initialLocation: '/stokvels/ubuntu-savings-circle',
     );
     addTearDown(router.dispose);
@@ -89,6 +103,7 @@ void main() {
       ProviderScope(
         retry: (retryCount, error) => null,
         overrides: [
+          ...baseOverrides(signedInAs: 'sipho'),
           homeRepositoryProvider.overrideWithValue(home),
           stokvelRepositoryProvider.overrideWithValue(
             StubStokvelRepository(
@@ -98,7 +113,11 @@ void main() {
             ),
           ),
         ],
-        child: MaterialApp.router(routerConfig: router),
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
       ),
     );
     await tester.pumpAndSettle();

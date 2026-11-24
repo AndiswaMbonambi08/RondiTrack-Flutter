@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ronditrack/app/config.dart';
-import 'package:ronditrack/app/config_provider.dart';
 import 'package:ronditrack/app/retry.dart';
 import 'package:ronditrack/app/router.dart';
 import 'package:ronditrack/core/session/session.dart';
@@ -17,10 +16,13 @@ import 'package:ronditrack/features/payout/application/payout_providers.dart';
 import 'package:ronditrack/features/payout/data/fake_payout_repository.dart';
 import 'package:ronditrack/features/stokvel/application/stokvel_providers.dart';
 import 'package:ronditrack/features/stokvel/data/fake_stokvel_repository.dart';
+import 'package:ronditrack/l10n/generated/app_localizations.dart';
+
+import 'overrides.dart';
 
 /// The whole app through the real router, on the real fakes with no delay.
 class AppHarness {
-  const new(this.tester, this.container);
+  const AppHarness(this.tester, this.container);
 
   final WidgetTester tester;
   final ProviderContainer container;
@@ -43,7 +45,7 @@ class AppHarness {
   }
 
   Future<void> signInAs(String personaId) async {
-    container.read(authProvider.notifier).signInAs(personaId);
+    (container.read(authProvider.notifier) as TestAuth).signInAs(personaId);
     await tester.pumpAndSettle();
   }
 
@@ -72,9 +74,7 @@ Future<AppHarness> pumpApp(
     ProviderScope(
       retry: appRetry,
       overrides: [
-        appConfigProvider.overrideWithValue(
-          AppConfig(flavor: flavor, apiBaseUrl: 'http://localhost'),
-        ),
+        ...baseOverrides(flavor: flavor),
         homeRepositoryProvider.overrideWith(
           (ref) => FakeHomeRepository(
             personaId: ref.watch(currentPersonaProvider),
@@ -108,6 +108,8 @@ Future<AppHarness> pumpApp(
       ],
       child: Consumer(
         builder: (context, ref, _) => MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           theme: buildTheme(Brightness.light),
           darkTheme: buildTheme(Brightness.dark),
           routerConfig: ref.watch(routerProvider),
